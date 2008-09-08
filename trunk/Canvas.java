@@ -10,6 +10,15 @@ public class Canvas extends JComponent {
         objects = new Vector();
         objects.add(new Mass());
     }
+    public void iterate(int[] env) {
+        for(Object o:objects) {
+            PhysObject obj = (PhysObject)o;
+            obj.setEnv(env);
+            try {
+                obj.move();
+            } catch (Exception e) {}
+        }
+    }
     public void paintComponent(Graphics g){
         System.out.println("!");
         Rectangle rect = g.getClipBounds();

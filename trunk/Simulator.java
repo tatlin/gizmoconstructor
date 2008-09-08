@@ -21,6 +21,10 @@ public class Simulator extends JApplet implements Runnable{
         while(true) {
             repaint();
             canvas.repaint();
+            int[] env = new int[2];
+            env[0] = 1;
+            env[1] = getHeight();
+            canvas.iterate(env);
             try {
                 simthread.sleep(50);
             } catch(InterruptedException ie) {System.out.println("!!");}

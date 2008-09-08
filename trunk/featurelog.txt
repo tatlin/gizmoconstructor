@@ -1,1 +1,2 @@
 3.0.1: Almost no functionality, merely draws a circle.   
+3.0.1.1: Still almost no functionality, makes a mass that bounces once, then freezes.

@@ -1,0 +1,9 @@
+#BlueJ class context
+comment0.params=p
+comment0.target=void\ interact(PhysObject)
+comment1.params=g
+comment1.target=void\ paintObject(Graphics)
+comment2.params=e
+comment2.target=void\ setEnv(int[])
+comment3.target=void\ move()
+numComments=4

@@ -1,6 +1,0 @@
-#BlueJ class context
-comment0.params=width\ height
-comment0.target=Canvas(int,\ int)
-comment1.params=g
-comment1.target=void\ paintComponent(Graphics)
-numComments=2

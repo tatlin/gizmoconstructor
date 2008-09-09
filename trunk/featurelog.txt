@@ -2,3 +2,4 @@
 3.0.2   Still almost no functionality, makes a mass that bounces once, then freezes.
 3.0.3   Better, the applet no longer freezes.
 3.1.0   MUCH Better! Applet no longer freezes, runs smoothly. Introduced clicking to add masses, dragging to add them at an initial velocity, Differentiating between right and left clicking.
+3.1.1   Started to work on shift-clicking and dragging to pick up and move things.

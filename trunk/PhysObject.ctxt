@@ -6,4 +6,6 @@ comment1.target=void\ paintObject(Graphics)
 comment2.params=p
 comment2.target=void\ interact(PhysObject)
 comment3.target=void\ move()
-numComments=4
+comment4.params=x\ y
+comment4.target=boolean\ isOver(int,\ int)
+numComments=5

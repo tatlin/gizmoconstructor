@@ -1,6 +1,6 @@
 #BlueJ class context
 comment0.params=e
-comment0.target=void\ setEnv(int[])
+comment0.target=void\ setEnv(double[])
 comment1.params=g
 comment1.target=void\ paintObject(Graphics)
 comment2.params=p

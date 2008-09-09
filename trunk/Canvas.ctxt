@@ -2,7 +2,7 @@
 comment0.params=width\ height
 comment0.target=Canvas(int,\ int)
 comment1.params=env
-comment1.target=void\ iterate(int[])
+comment1.target=void\ iterate(double[])
 comment2.params=g
 comment2.target=void\ paintComponent(Graphics)
 numComments=3

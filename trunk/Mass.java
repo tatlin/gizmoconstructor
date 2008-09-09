@@ -1,8 +1,18 @@
 import java.awt.*;
 public class Mass extends PhysObject{
-    private double x = 20, y = 20, fX = 0, fY = 0, vX = 0, vY = 0;
-    private double[] env = new double[2];
+    private double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0;
+    private double[] env = new double[3];
     private boolean mouseOver = false;
+    public Mass(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    public Mass(int x, int y, double vX, double vY) {
+        this.x = x;
+        this.y = y;
+        this.vX = vX;
+        this.vY = vY;
+    }
     public void interact(PhysObject p) {
         if(p instanceof Mass) {
         }
@@ -14,6 +24,7 @@ public class Mass extends PhysObject{
     public void setEnv(double[] e) {
         env[0] = e[0];
         env[1] = e[1];
+        env[2] = e[2];
     }
     public void gravity() {
         fY += env[0];
@@ -26,6 +37,14 @@ public class Mass extends PhysObject{
         if(y < 0) {
             y = 0-y;
             vY = 0-vY;
+        }
+        if(x > env[2]) {
+            x -= 2*(x-env[2]);
+            vX = 0-vX;
+        }
+        if(x < 0) {
+            x = 0-x;
+            vX = 0-vX;
         }
     }
     public void move() {

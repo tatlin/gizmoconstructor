@@ -2,9 +2,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.*;
-import java.util.*;
 
-public class Simulator extends JApplet implements Runnable{
+public class Simulator extends JApplet implements Runnable, MouseListener, MouseMotionListener{
     private Thread simthread;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0;
     private int mode = CONSTRUCT, massMode = FREE_MASS;
@@ -13,6 +12,8 @@ public class Simulator extends JApplet implements Runnable{
     public void init() {
         canvas = new Canvas(getWidth(), getHeight());
         getContentPane().add(canvas);
+        addMouseListener(this);
+        addMouseMotionListener(this);
     }
     public void start() {
         simthread = new Thread(this);
@@ -21,9 +22,10 @@ public class Simulator extends JApplet implements Runnable{
     public void run() {
         while(true) {
             repaint();
-            double[] env = new double[2];
+            double[] env = new double[3];
             env[0] = 0.75;
             env[1] = getHeight();
+            env[2] = getWidth();
             canvas.iterate(env);
             canvas.iters = this.iters;
             canvas.repaint();
@@ -33,5 +35,19 @@ public class Simulator extends JApplet implements Runnable{
             } catch(InterruptedException ie) {System.out.println("!!");}
         }
     }
-        
+    public void mouseExited(MouseEvent me) {}
+    public void mouseEntered(MouseEvent me) {}
+    public void mousePressed(MouseEvent me) {
+        canvas.mousePress(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
+    }
+    public void mouseReleased(MouseEvent me) {
+        canvas.mouseRelease(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
+    }
+    public void mouseClicked(MouseEvent me) {
+        canvas.mouseClick(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
+    }
+    public void mouseMoved(MouseEvent me) {}  
+    public void mouseDragged(MouseEvent me) {
+        canvas.mouseDrag(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
+    }
 }    

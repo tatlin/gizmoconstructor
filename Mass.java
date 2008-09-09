@@ -1,7 +1,7 @@
 import java.awt.*;
 public class Mass extends PhysObject{
-    private int x = 20, y = 20, fX = 0, fY = 0, vX = 0, vY = 0;
-    private int[] env = new int[2];
+    private double x = 20, y = 20, fX = 0, fY = 0, vX = 0, vY = 0;
+    private double[] env = new double[2];
     private boolean mouseOver = false;
     public void interact(PhysObject p) {
         if(p instanceof Mass) {
@@ -9,12 +9,9 @@ public class Mass extends PhysObject{
     }
     public void paintObject(Graphics g) {
         g.setColor(Color.black);
-        g.fillOval(x,y,6,6);
-        if(mouseOver) {
-            g.drawOval(x-2,y-2,9,9);
-        }
+        g.fillOval((int)x,(int)y,6,6);
     }
-    public void setEnv(int[] e) {
+    public void setEnv(double[] e) {
         env[0] = e[0];
         env[1] = e[1];
     }

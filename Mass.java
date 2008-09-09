@@ -1,8 +1,9 @@
 import java.awt.*;
 public class Mass extends PhysObject{
-    private double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0;
+    public double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0;
     private double[] env = new double[3];
     private boolean mouseOver = false;
+    public boolean selected = false;
     public Mass(int x, int y) {
         this.x = x;
         this.y = y;
@@ -19,6 +20,9 @@ public class Mass extends PhysObject{
     }
     public void paintObject(Graphics g) {
         g.setColor(Color.black);
+        if(selected) {
+            g.setColor(Color.blue);
+        }
         g.fillOval((int)x,(int)y,6,6);
     }
     public void setEnv(double[] e) {
@@ -48,6 +52,9 @@ public class Mass extends PhysObject{
         }
     }
     public void move() {
+        if(selected) {
+            return;
+        }
         gravity();
         vX += fX;
         vY += fY;
@@ -56,5 +63,10 @@ public class Mass extends PhysObject{
         bounce();
         fX = 0;
         fY = 0;
+    }
+    public boolean isOver(int x, int y) {
+        double X = this.x+3;
+        double Y = this.y+3;
+        return (((X-x)*(X-x) + (Y-y)*(Y-y)) < 49);
     }
 }

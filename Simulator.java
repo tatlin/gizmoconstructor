@@ -3,7 +3,7 @@ import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.*;
 
-public class Simulator extends JApplet implements Runnable, MouseListener, MouseMotionListener{
+public class Simulator extends JApplet implements Runnable, MouseListener, MouseMotionListener, KeyListener{
     private Thread simthread;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0;
     private int mode = CONSTRUCT, massMode = FREE_MASS;
@@ -14,6 +14,7 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
         getContentPane().add(canvas);
         addMouseListener(this);
         addMouseMotionListener(this);
+        addKeyListener(this);
     }
     public void start() {
         simthread = new Thread(this);
@@ -30,7 +31,7 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
             canvas.iters = this.iters;
             canvas.repaint();
             try {
-                simthread.sleep(10);
+                simthread.sleep(50);
                 this.iters++;
             } catch(InterruptedException ie) {System.out.println("!!");}
         }
@@ -50,4 +51,11 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
     public void mouseDragged(MouseEvent me) {
         canvas.mouseDrag(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
     }
+    public void keyPressed(KeyEvent ke) {
+        canvas.keyPress(ke.getKeyCode());
+    }
+    public void keyReleased(KeyEvent ke) {
+        canvas.keyRelease(ke.getKeyCode());
+    }
+    public void keyTyped(KeyEvent ke) {}
 }    

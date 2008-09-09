@@ -1,6 +1,12 @@
 #BlueJ class context
 comment0.target=void\ init()
 comment1.target=void\ start()
+comment10.params=ke
+comment10.target=void\ keyPressed(KeyEvent)
+comment11.params=ke
+comment11.target=void\ keyReleased(KeyEvent)
+comment12.params=ke
+comment12.target=void\ keyTyped(KeyEvent)
 comment2.target=void\ run()
 comment3.params=me
 comment3.target=void\ mouseExited(MouseEvent)
@@ -16,4 +22,4 @@ comment8.params=me
 comment8.target=void\ mouseMoved(MouseEvent)
 comment9.params=me
 comment9.target=void\ mouseDragged(MouseEvent)
-numComments=10
+numComments=13

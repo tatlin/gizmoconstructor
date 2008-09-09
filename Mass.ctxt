@@ -1,11 +1,15 @@
 #BlueJ class context
-comment0.params=p
-comment0.target=void\ interact(PhysObject)
-comment1.params=g
-comment1.target=void\ paintObject(Graphics)
-comment2.params=e
-comment2.target=void\ setEnv(double[])
-comment3.target=void\ gravity()
-comment4.target=void\ bounce()
-comment5.target=void\ move()
-numComments=6
+comment0.params=x\ y
+comment0.target=Mass(int,\ int)
+comment1.params=x\ y\ vX\ vY
+comment1.target=Mass(int,\ int,\ double,\ double)
+comment2.params=p
+comment2.target=void\ interact(PhysObject)
+comment3.params=g
+comment3.target=void\ paintObject(Graphics)
+comment4.params=e
+comment4.target=void\ setEnv(double[])
+comment5.target=void\ gravity()
+comment6.target=void\ bounce()
+comment7.target=void\ move()
+numComments=8

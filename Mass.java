@@ -33,7 +33,7 @@ public class Mass extends PhysObject{
         env[2] = e[2];
     }
     public void gravity() {
-        fY += env[0];
+        fY += env[0]*0.1;
     }
     public void bounce() {
         if(y > env[1]) {
@@ -62,8 +62,8 @@ public class Mass extends PhysObject{
         gravity();
         vX += fX;
         vY += fY;
-        x += vX;
-        y += vY;
+        x += vX*0.1;
+        y += vY*0.1;
         bounce();
         fX = 0;
         fY = 0;

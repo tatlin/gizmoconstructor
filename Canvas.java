@@ -9,7 +9,7 @@ public class Canvas extends JComponent {
     private int startX, startY, endX, endY;
     private boolean dragging = false, draggingMass, pressed = false;
     private boolean isRight = false;
-    private boolean shift, ctrl = false;
+    private boolean shift, ctrl, shiftb = false;
     private int massDragged;
     private int mouX = 0, mouY = 0;
     public Canvas(int width, int height) {
@@ -18,7 +18,7 @@ public class Canvas extends JComponent {
         objects = new Vector();
     }
     public void iterate(double[] env) {
-        if(shift && pressed && !draggingMass) {
+        if(shiftb && pressed && !draggingMass) {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
@@ -36,7 +36,11 @@ public class Canvas extends JComponent {
                 draggingMass = true;
                 ((Mass)objects.elementAt(min)).selected = true;          
             }
-        }                    
+        }  
+        if(draggingMass) {
+            ((Mass)objects.elementAt(massDragged)).x = mouX-3;
+            ((Mass)objects.elementAt(massDragged)).y = mouY-3;
+        }                  
         for(Object o:objects) {
             PhysObject obj = (PhysObject)o;
             obj.setEnv(env);
@@ -44,19 +48,23 @@ public class Canvas extends JComponent {
                 obj.move();
             } catch (Exception e) {}
         }
+            
     }
     public void paintComponent(Graphics g){
-        g.clearRect(0,0, getWidth(), getHeight());
         for(Object o:objects) {
             ((PhysObject)o).paintObject(g);
         }
-        if(dragging && !isRight && !shift) {
+        if(dragging && !isRight && !shiftb) {
             g.setColor(new Color(200, 200, 200));
-            g.drawLine(startX, startY, endX, endY);
+            g.drawLine(startX, startY, mouX, mouY);
             g.drawOval(startX-3, startY-3, 6, 6);
+            g.drawOval(mouX-3, mouY-3, 6, 6);
         }
     }
     public void mouseMove(int x, int y) {
+        if(pressed) {
+            dragging = true;
+        }
         mouX = x;
         mouY = y;
     }
@@ -65,22 +73,19 @@ public class Canvas extends JComponent {
         startY = y;
         isRight = isR;
         pressed = true;
+        if(shift) {
+            shiftb = true;
+        }
     }
     public void mouseDrag(int x, int y, boolean isR) {
         dragging = true;
-        endX = x;
-        endY = y;
-        if(shift) {
-            if(draggingMass) {
-                ((Mass)objects.elementAt(massDragged)).x = endX;
-                ((Mass)objects.elementAt(massDragged)).y = endY;
-            }
-        }
+        mouX = x;
+        mouY = y;
     }
     public void mouseRelease(int x, int y, boolean isR) {
         dragging = false;
         pressed = false;
-        if(shift) {
+        if(shiftb) {
             if(draggingMass) {
                 ((Mass)objects.elementAt(massDragged)).selected = false;
                 draggingMass = false;
@@ -90,14 +95,18 @@ public class Canvas extends JComponent {
                 Mass mass = new Mass(x, y);
                 objects.add(mass);
             } else {
-                Mass mass = new Mass(x, y, (endX-startX)*0.1, (endY-startY)*0.1);
+                Mass mass = new Mass(x, y, (x-startX)*0.1, (y-startY)*0.1);
                 objects.add(mass);
             }
         }
+        shiftb = false;
     }
     public void keyPress(int k) {
         if(k == KeyEvent.VK_SHIFT) {
             shift = true;
+            if(pressed) {
+                shiftb = true;
+            }
         }
         if(k == KeyEvent.VK_CONTROL) {
             ctrl = true;

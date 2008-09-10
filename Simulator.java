@@ -31,7 +31,7 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
             canvas.iters = this.iters;
             canvas.repaint();
             try {
-                simthread.sleep(50);
+                simthread.sleep(25);
                 this.iters++;
             } catch(InterruptedException ie) {System.out.println("!!");}
         }
@@ -44,10 +44,10 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
     public void mouseReleased(MouseEvent me) {
         canvas.mouseRelease(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
     }
-    public void mouseClicked(MouseEvent me) {
-        canvas.mouseClick(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
+    public void mouseClicked(MouseEvent me) {}
+    public void mouseMoved(MouseEvent me) {
+        canvas.mouseMove(me.getX(), me.getY());
     }
-    public void mouseMoved(MouseEvent me) {}  
     public void mouseDragged(MouseEvent me) {
         canvas.mouseDrag(me.getX(), me.getY(), (me.getButton() == me.BUTTON3));
     }

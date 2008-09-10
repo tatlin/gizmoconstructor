@@ -7,5 +7,5 @@ comment2.params=p
 comment2.target=void\ interact(PhysObject)
 comment3.target=void\ move()
 comment4.params=x\ y
-comment4.target=boolean\ isOver(int,\ int)
+comment4.target=double\ dist(int,\ int)
 numComments=5

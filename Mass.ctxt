@@ -13,5 +13,5 @@ comment5.target=void\ gravity()
 comment6.target=void\ bounce()
 comment7.target=void\ move()
 comment8.params=x\ y
-comment8.target=boolean\ isOver(int,\ int)
+comment8.target=double\ dist(int,\ int)
 numComments=9

@@ -4,5 +4,5 @@ public abstract class PhysObject {
     public abstract void paintObject(Graphics g);
     public abstract void interact(PhysObject p);
     public abstract void move();
-    public abstract boolean isOver(int x, int y);
+    public abstract double dist(int x, int y);
 }

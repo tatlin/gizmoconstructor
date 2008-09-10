@@ -9,12 +9,16 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
     private int mode = CONSTRUCT, massMode = FREE_MASS;
     private int iters = 0;
     private Canvas canvas;
+    private Graphics buffG;
+    private Image buff;
     public void init() {
         canvas = new Canvas(getWidth(), getHeight());
         getContentPane().add(canvas);
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
+        buff = createImage(getWidth(), getHeight());
+        buffG = buff.getGraphics();
     }
     public void start() {
         simthread = new Thread(this);
@@ -24,17 +28,25 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
         while(true) {
             repaint();
             double[] env = new double[3];
-            env[0] = 0.75;
+            env[0] = 1.0;
             env[1] = getHeight();
             env[2] = getWidth();
             canvas.iterate(env);
             canvas.iters = this.iters;
-            canvas.repaint();
+            repaint();
             try {
-                simthread.sleep(25);
+                simthread.sleep(1);
                 this.iters++;
             } catch(InterruptedException ie) {System.out.println("!!");}
         }
+    }
+    public void paint(Graphics g) {
+        buffG.clearRect(0,0,getWidth(), getHeight());
+        canvas.paint(buffG);
+        g.drawImage(buff,0,0,this);
+    }
+    public void update(Graphics g) {
+        paint(g);
     }
     public void mouseExited(MouseEvent me) {}
     public void mouseEntered(MouseEvent me) {}

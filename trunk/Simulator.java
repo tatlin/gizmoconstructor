@@ -27,15 +27,16 @@ public class Simulator extends JApplet implements Runnable, MouseListener, Mouse
     public void run() {
         while(true) {
             repaint();
-            double[] env = new double[3];
-            env[0] = 1.0;
-            env[1] = getHeight();
-            env[2] = getWidth();
+            double[] env = new double[4];
+            env[0] = Math.pow(2,0.3)-1;
+            env[1] = Math.pow(2,0.0)-1;
+            env[2] = getHeight();
+            env[3] = getWidth();
             canvas.iterate(env);
             canvas.iters = this.iters;
             repaint();
             try {
-                simthread.sleep(1);
+                simthread.sleep(10);
                 this.iters++;
             } catch(InterruptedException ie) {System.out.println("!!");}
         }

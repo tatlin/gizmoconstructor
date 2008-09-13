@@ -1,10 +1,12 @@
 import java.awt.*;
 import java.math.*;
 public class Mass extends PhysObject{
-    public double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0;
-    private double[] env = new double[3];
+    public double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0, ofX, ofY;
+    private double[] env = new double[4];
     private boolean mouseOver = false;
     public boolean selected = false;
+    private double stepmult = 1;
+    public Mass() {}
     public Mass(int x, int y) {
         this.x = x;
         this.y = y;
@@ -28,30 +30,36 @@ public class Mass extends PhysObject{
         g.fillOval((int)x,(int)y,6,6);
     }
     public void setEnv(double[] e) {
-        env[0] = e[0];
-        env[1] = e[1];
-        env[2] = e[2];
+        for(int i=0;i<e.length;i++) {
+            env[i] = e[i];
+        }
     }
     public void gravity() {
-        fY += env[0]*0.1;
+        fY += env[0]/stepmult;
     }
     public void bounce() {
-        if(y > env[1]) {
-            y -= 2*(y-env[1]);
+        if(y > env[2] - 30) {
+            y -= 2*(y-env[2] + 30);
+            y = env[2] - 30;
             vY = 0-vY;
         }
         if(y < 0) {
             y = 0-y;
             vY = 0-vY;
         }
-        if(x > env[2]) {
-            x -= 2*(x-env[2]);
+        if(x > env[3]) {
+            x -= 2*(x-env[3]);
             vX = 0-vX;
         }
         if(x < 0) {
             x = 0-x;
             vX = 0-vX;
         }
+    }
+    public void friction() {
+        vX *= Math.pow(1-env[1],1/stepmult);
+        vY *= Math.pow(1-env[1],1/stepmult);
+        ofY = fY;
     }
     public void move() {
         if(selected) {
@@ -62,8 +70,9 @@ public class Mass extends PhysObject{
         gravity();
         vX += fX;
         vY += fY;
-        x += vX*0.1;
-        y += vY*0.1;
+        friction();
+        x += vX/stepmult;
+        y += vY/stepmult;
         bounce();
         fX = 0;
         fY = 0;

@@ -4,4 +4,4 @@
 3.1.0   MUCH Better! Applet no longer freezes, runs smoothly. Introduced clicking to add masses, dragging to add them at an initial velocity, Differentiating between right and left clicking.
 3.1.1   Started to work on shift-clicking and dragging to pick up and move things.
 3.1.2   Can shift drag to pick things up. Hold the shift button and left mouse button, and as soon as you're near a mass, you shall pick it up
-3.1.3   Made picking things up less fail, changed the source code slightly so it looks better.
+3.1.3   Made picking things up less fail, changed the source code slightly so it looks better. 

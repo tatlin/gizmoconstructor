@@ -1,12 +1,16 @@
 #BlueJ class context
 comment0.params=width\ height
 comment0.target=Canvas(int,\ int)
+comment0.text=\nMakes\ a\ new\ Canvas\ with\ given\ height\ and\ width\n\n@param\ \ \ width\ \ \ The\ width\ of\ the\ new\ Canvas\n@param\ \ \ height\ \ The\ height\ of\ the\ new\ Canvas\n\n
 comment1.params=env
 comment1.target=void\ iterate(double[])
+comment1.text=\nIterate\ the\ physobjects\ in\ the\ objects\ vector\n\n@param\ \ \ env\ \ \ \ \ The\ environmental\ variables\ -\ gravity,\ friction,\ height,\ width\n\n
 comment2.params=g
 comment2.target=void\ paintComponent(Graphics)
+comment2.text=\nPaints\ the\ canvas\ and\ all\ of\ the\ objects\ on\ it\n\n@param\ \ \ g\ \ \ \ \ \ \ A\ graphics\ object\n\n
 comment3.params=x\ y
 comment3.target=void\ mouseMove(int,\ int)
+comment3.text=\nReact\ to\ the\ mouse\ being\ moved\n\n@param\ \ \ x\ \ \ \ \ \ \ The\ x\ coordinate\ of\ the\ mouse\n@param\ \ \ y\ \ \ \ \ \ \ The\ y\ coordinate\ of\ the\ mouse\n\n
 comment4.params=x\ y\ isR
 comment4.target=void\ mousePress(int,\ int,\ boolean)
 comment5.params=x\ y\ isR
@@ -17,4 +21,6 @@ comment7.params=k
 comment7.target=void\ keyPress(int)
 comment8.params=k
 comment8.target=void\ keyRelease(int)
-numComments=9
+comment9.params=k
+comment9.target=void\ keyType(int)
+numComments=10

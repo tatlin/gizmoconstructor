@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.event.*;
 import java.awt.event.*;
 import java.awt.*;
 /**
@@ -46,8 +45,8 @@ public class Simulator extends  JApplet implements  Runnable, MouseListener, Mou
         while(true) {
             repaint();
             double[] env = new double[4]; //env = {gravity, friction, height, width}
-            env[0] = Math.pow(2,0.3)-1;
-            env[1] = Math.pow(2,0.0)-1;
+            env[0] = 0.3;
+            env[1] = 0.0;
             env[2] = getHeight();
             env[3] = getWidth();
             canvas.iterate(env);

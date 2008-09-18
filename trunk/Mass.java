@@ -45,14 +45,17 @@ public class Mass extends PhysObject{
         }
         if(y < 0) {
             y = 0-y;
+            y = 0;
             vY = 0-vY;
         }
         if(x > env[3]) {
             x -= 2*(x-env[3]);
+            x = env[3];
             vX = 0-vX;
         }
         if(x < 0) {
             x = 0-x;
+            x = 0;
             vX = 0-vX;
         }
     }

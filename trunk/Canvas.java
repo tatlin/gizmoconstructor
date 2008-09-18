@@ -28,16 +28,19 @@ public class Canvas extends JComponent {
      * key = what key was most recently pressed
      */
     private Vector objects;
+    private double[] env;
     public int iters;
     private int startX, startY, endX, endY;
     private boolean dragging = false, draggingMass, pressed = false;
     private boolean isRight = false;
     private boolean shift, ctrl, shiftb = false, ctrlb = false;
+    private boolean deleted = false;
     private int massDragged;
     private int mouX = 0, mouY = 0;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0, FIXED_MASS = 1;
     private int mode = CONSTRUCT, massMode = FREE_MASS;
     private int key = 0;
+    private int width, height;
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -45,6 +48,8 @@ public class Canvas extends JComponent {
      * @param   height  The height of the new Canvas
      */
     public Canvas(int width, int height) {
+        this.width = width;
+        this.height = height;
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.white);
         objects = new Vector();
@@ -55,6 +60,9 @@ public class Canvas extends JComponent {
      * @param   env     The environmental variables - gravity, friction, height, width
      */
     public void iterate(double[] env) {
+        this.env = env;
+        env[0] = Math.pow(2,env[0])-1;
+        env[1] = Math.pow(2,env[1])-1;
         if(shiftb && pressed && !draggingMass) {
             int i = 0;
             int min = 0;
@@ -73,7 +81,7 @@ public class Canvas extends JComponent {
                 draggingMass = true;
                 ((Mass)objects.elementAt(min)).selected = true;          
             }
-        }  else if(ctrlb && pressed && !draggingMass) {
+        }  else if(ctrlb && pressed && !deleted) {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
@@ -88,6 +96,7 @@ public class Canvas extends JComponent {
             }
             if(closeEnough) {
                 objects.remove(objects.elementAt(min));
+                deleted = true;
             }
         }  
         if(draggingMass) {
@@ -124,6 +133,12 @@ public class Canvas extends JComponent {
             g.drawOval(startX-3, startY-3, 6, 6);
             g.drawOval(mouX-3, mouY-3, 6, 6);
         }
+        g.setColor(Color.black);
+        g.drawRect(0,0, this.width-1, this.height-31);
+        g.drawRect(0,this.height-26,100,25);
+        g.drawLine(0,this.height-14,(int)(100*env[0]), this.height-14);
+        g.drawLine((int)(100*env[0]), this.height-26,(int)(100*env[0]), this.height-1);
+        g.drawString("G",110,this.height-14);
     }
     /**
      * React to the mouse being moved
@@ -184,6 +199,7 @@ public class Canvas extends JComponent {
         }
         shiftb = false;
         ctrlb = false;
+        deleted = false;
     }
     public void keyPress(int k) {
         if(k == KeyEvent.VK_SHIFT) {
@@ -206,6 +222,7 @@ public class Canvas extends JComponent {
         }
         if(k == KeyEvent.VK_CONTROL) {
             ctrl = false;
+            deleted = false;
         }
         if(k == KeyEvent.VK_F) {
             massMode = FREE_MASS;
@@ -215,6 +232,11 @@ public class Canvas extends JComponent {
         }
         if(k == KeyEvent.VK_SPACE) {
             mode = 1-mode;
+        }
+        if(k == KeyEvent.VK_C) {
+            objects = new Vector();
+            mode = CONSTRUCT;
+            massMode = FREE_MASS;
         }
     }
     public void keyType(int k) {

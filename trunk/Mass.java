@@ -23,11 +23,23 @@ public class Mass extends PhysObject{
     }
     public void paintObject(Graphics g) {
         g.setColor(Color.black);
+        double drawX = x;
+        double drawY = y;
+        if(x > env[3]) {
+            drawX = env[3];
+        } else if (x < 0 ) {
+            drawX = 0;
+        }
+        if(y > env[2]) {
+            drawY = env[2];
+        } else if(y < 0) {
+            drawY = 0;
+        }
         if(selected) {
             g.setColor(Color.blue);
-            g.drawOval((int)x-3, (int)y-3, 12, 12);
+            g.drawOval((int)drawX-3, (int)drawY-3, 12, 12);
         }
-        g.fillOval((int)x,(int)y,6,6);
+        g.fillOval((int)drawX,(int)drawY,6,6);
     }
     public void setEnv(double[] e) {
         for(int i=0;i<e.length;i++) {
@@ -40,7 +52,7 @@ public class Mass extends PhysObject{
     public void bounce() {
         if(y > env[2] - 30) {
             y -= 2*(y-env[2] + 30);
-            y = env[2] - 30;
+            //y = env[2] - 30;
             vY = 0-vY;
         }
         if(y < 0) {
@@ -50,7 +62,7 @@ public class Mass extends PhysObject{
         }
         if(x > env[3]) {
             x -= 2*(x-env[3]);
-            x = env[3];
+            //x = env[3];
             vX = 0-vX;
         }
         if(x < 0) {

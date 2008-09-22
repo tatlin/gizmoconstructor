@@ -1,8 +1,8 @@
 #BlueJ class context
 comment0.params=x\ y
-comment0.target=Fmass(int,\ int)
+comment0.target=Fmass(double,\ double)
 comment1.params=x\ y\ vX\ vY
-comment1.target=Fmass(int,\ int,\ double,\ double)
+comment1.target=Fmass(double,\ double,\ double,\ double)
 comment2.target=void\ move()
 comment3.params=g
 comment3.target=void\ paintObject(Graphics)

@@ -1,17 +1,18 @@
 import java.awt.*;
 import java.math.*;
 public class Mass extends PhysObject{
-    public double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0, ofX, ofY;
+    public double x = 0, y = 0, fX = 0, fY = 0, vX = 0, vY = 0, oX=0, oY=0;
     private double[] env = new double[4];
     private boolean mouseOver = false;
     public boolean selected = false;
     private double stepmult = 20;
+    private int bX = 15, bY = 45;
     public Mass() {}
-    public Mass(int x, int y) {
+    public Mass(double x, double y) {
         this.x = x;
         this.y = y;
     }
-    public Mass(int x, int y, double vX, double vY) {
+    public Mass(double x, double y, double vX, double vY) {
         this.x = x;
         this.y = y;
         this.vX = vX;
@@ -25,13 +26,13 @@ public class Mass extends PhysObject{
         g.setColor(Color.black);
         double drawX = x;
         double drawY = y;
-        if(x > env[3]-6) {
-            drawX = env[3]-6;
+        if(x > env[3]-bX) {
+            drawX = env[3]-bX;
         } else if (x < 0 ) {
             drawX = 0;
         }
-        if(y > env[2]-36) {
-            drawY = env[2]-36;
+        if(y > env[2]-bY) {
+            drawY = env[2]-bY;
         } else if(y < 0) {
             drawY = 0;
         }
@@ -50,9 +51,8 @@ public class Mass extends PhysObject{
         fY += env[0]/stepmult;
     }
     public void bounce() {
-        if(y > env[2] - 30) {
-            y -= 2*(y-env[2] + 30);
-            //y = env[2] - 30;
+        if(y > env[2] - bY) {
+            y -= 2*(y-env[2] + bY);
             vY = 0-vY;
         }
         if(y < 0) {
@@ -60,8 +60,8 @@ public class Mass extends PhysObject{
             y = 0;
             vY = 0-vY;
         }
-        if(x > env[3]) {
-            x -= 2*(x-env[3]);
+        if(x > env[3]-bX) {
+            x -= 2*(x-env[3]+bX);
             //x = env[3];
             vX = 0-vX;
         }

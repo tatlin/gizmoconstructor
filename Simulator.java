@@ -32,6 +32,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
         addKeyListener(this);
         simthread = new Thread(this);
         simthread.start();
+        this.setBackground(Color.white);
     }
     /**
      * Start the refresh thread.
@@ -136,7 +137,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
         canvas.keyType(ke.getKeyCode());
     }    
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("BorderDemo");
+        JFrame frame = new JFrame("Gizmoconstructor");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Simulator c = new Simulator();
         c.setOpaque(true); 

@@ -1,11 +1,11 @@
 #BlueJ class context
 comment0.target=Mass()
 comment1.params=x\ y
-comment1.target=Mass(int,\ int)
+comment1.target=Mass(double,\ double)
 comment10.params=x\ y
 comment10.target=double\ dist(int,\ int)
 comment2.params=x\ y\ vX\ vY
-comment2.target=Mass(int,\ int,\ double,\ double)
+comment2.target=Mass(double,\ double,\ double,\ double)
 comment3.params=p
 comment3.target=void\ interact(PhysObject)
 comment4.params=g

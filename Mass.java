@@ -5,7 +5,7 @@ public class Mass extends PhysObject{
     private double[] env = new double[4];
     private boolean mouseOver = false;
     public boolean selected = false;
-    private double stepmult = 1;
+    private double stepmult = 20;
     public Mass() {}
     public Mass(int x, int y) {
         this.x = x;
@@ -25,13 +25,13 @@ public class Mass extends PhysObject{
         g.setColor(Color.black);
         double drawX = x;
         double drawY = y;
-        if(x > env[3]) {
-            drawX = env[3];
+        if(x > env[3]-6) {
+            drawX = env[3]-6;
         } else if (x < 0 ) {
             drawX = 0;
         }
-        if(y > env[2]) {
-            drawY = env[2];
+        if(y > env[2]-36) {
+            drawY = env[2]-36;
         } else if(y < 0) {
             drawY = 0;
         }
@@ -74,7 +74,6 @@ public class Mass extends PhysObject{
     public void friction() {
         vX *= Math.pow(1-env[1],1/stepmult);
         vY *= Math.pow(1-env[1],1/stepmult);
-        ofY = fY;
     }
     public void move() {
         if(selected) {

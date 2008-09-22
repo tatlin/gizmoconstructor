@@ -2,6 +2,7 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
 /**
  * Canvas - a drawing surface for Simulator
  * 
@@ -27,6 +28,7 @@ public class Canvas extends JComponent {
      * mode, massMode = current mode and what kind of mass are being made
      * key = what key was most recently pressed
      */
+    private String debug = "";
     private Vector objects;
     private double[] env;
     public int iters;
@@ -38,9 +40,10 @@ public class Canvas extends JComponent {
     private int massDragged;
     private int mouX = 0, mouY = 0;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0, FIXED_MASS = 1;
-    private int mode = CONSTRUCT, massMode = FREE_MASS;
+    private int mode = SIMULATE, massMode = FREE_MASS;
     private int key = 0;
     private int width, height;
+    private double gravity=0.3, friction = 0.0;
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -61,9 +64,32 @@ public class Canvas extends JComponent {
      */
     public void iterate(double[] env) {
         this.env = env;
-        env[0] = Math.pow(2,env[0])-1;
+        env[0] = gravity;
+        env[1] = friction;
+        env[0] = (Math.pow(2,env[0])-1)*2;
         env[1] = Math.pow(2,env[1])-1;
-        if(shiftb && pressed && !draggingMass) {
+        if(startY > env[2] - 30) {
+            if(dragging) {
+                if(startX >= 5 && startX <= 105) {
+                    gravity = ((double)mouX-5)/100;
+                    if(gravity > 1) {
+                        gravity = 1;
+                    }
+                    if(gravity < 0) {
+                        gravity = 0;
+                    }
+                }
+                if(startX >= 155 && startX <= 255) {
+                    friction = ((double)mouX-155)/100;
+                    if(friction > 1) {
+                        friction = 1;
+                    }
+                    if(friction < 0) {
+                        friction = 0;
+                    }
+                }
+            }
+        } else if(shiftb && pressed && !draggingMass) {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
@@ -124,10 +150,11 @@ public class Canvas extends JComponent {
      * @param   g       A graphics object
      */
     public void paintComponent(Graphics g){
+        iterate(env);
         for(Object o:objects) {
             ((PhysObject)o).paintObject(g);
         }
-        if(dragging && !isRight && !shiftb && !ctrlb) {
+        if(dragging && !isRight && !shiftb && !ctrlb && (mouY < env[2]-30) && (startY < env[2]-30)) {
             g.setColor(new Color(200, 200, 200));
             g.drawLine(startX, startY, mouX, mouY);
             g.drawOval(startX-3, startY-3, 6, 6);
@@ -135,9 +162,20 @@ public class Canvas extends JComponent {
         }
         g.setColor(Color.black);
         g.drawRect(0,0, this.width-1, this.height-31);
-        g.drawRect(0,this.height-26,100,25);
-        g.drawLine(0,this.height-14,(int)(100*env[0]), this.height-14);
-        g.drawLine((int)(100*env[0]), this.height-26,(int)(100*env[0]), this.height-1);
+        g.drawRect(5,this.height-26,100,25);
+        g.setColor(Color.blue);
+        g.drawLine(5,this.height-13,(int)(100*gravity)+5, this.height-13);
+        g.setColor(Color.red);        
+        g.drawLine(105,this.height-13,(int)(100*gravity)+5, this.height-13);
+        g.setColor(Color.black);
+        g.drawLine((int)(100*gravity)+5, this.height-26,(int)(100*gravity)+5, this.height-1);
+        g.drawRect(155,this.height-26,100,25);
+        g.setColor(Color.blue);
+        g.drawLine(155,this.height-13,(int)(100*friction)+155, this.height-13);
+        g.setColor(Color.red);
+        g.drawLine(255,this.height-13,(int)(100*friction)+155, this.height-13);
+        g.setColor(Color.black);
+        g.drawLine((int)(100*friction)+155, this.height-26,(int)(100*friction)+155, this.height-1);
         g.drawString("G",110,this.height-14);
     }
     /**
@@ -146,7 +184,7 @@ public class Canvas extends JComponent {
      * @param   x       The x coordinate of the mouse
      * @param   y       The y coordinate of the mouse
      */
-    public void mouseMove(int x, int y) {
+    public void mouseMove(int x, int y) {            
         if(pressed) {
             dragging = true;
         }
@@ -173,6 +211,16 @@ public class Canvas extends JComponent {
     public void mouseRelease(int x, int y, boolean isR) {
         dragging = false;
         pressed = false;
+        if(mouY > env[2] - 30) {
+            draggingMass = false;
+            if(draggingMass) {
+                ((Mass)objects.elementAt(massDragged)).selected = false;
+            }
+            shiftb = false;
+            ctrlb = false;
+            deleted = false;
+            return;
+        }
         if(shiftb) {
             if(draggingMass) {
                 ((Mass)objects.elementAt(massDragged)).selected = false;
@@ -234,6 +282,7 @@ public class Canvas extends JComponent {
             mode = 1-mode;
         }
         if(k == KeyEvent.VK_C) {
+            save("test");
             objects = new Vector();
             mode = CONSTRUCT;
             massMode = FREE_MASS;
@@ -247,5 +296,27 @@ public class Canvas extends JComponent {
                 massMode = FIXED_MASS;
             }
         }
+    }
+    public void save(String name) {
+        try {
+            OutputStream fout = new FileOutputStream("test.xml");
+            BufferedOutputStream bout = new BufferedOutputStream(fout);
+            OutputStreamWriter out = new OutputStreamWriter(bout, "8859_1");
+            out.write("<?xml version=\"1.0\" ");
+            out.write("encoding=\"ISO-8859-1\"?>\r\n");
+            out.write("<Objects>\r\n"); 
+            for(Object o: objects) {
+                if(o instanceof Mass) {
+                    out.write("  <mass x=\"" + ((Mass)o).x + "\" y=\"" + ((Mass)o).y + "\" vX=\"" + ((Mass)o).vX + "\" vY=\"" + ((Mass)o).vY + "\" fixed=\"" + (o instanceof Fmass) + "\">" );
+                    out.write("</mass>");
+                }
+            }
+            out.write("</Objects>\r\n"); 
+            out.flush();
+            out.close();      
+        } catch (Exception e) {
+            debug = e.getMessage();
+        }
+        
     }
 }

@@ -1,12 +1,13 @@
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
+import java.awt.image.*;
 /**
  * Simulator applet inspired by Ed Burton's sodaconstructor
  * @author Colin Stanfill
  * @version 3.1.4
  */
-public class Simulator extends  JApplet implements  Runnable, MouseListener, MouseMotionListener, KeyListener{
+public class Simulator extends JPanel implements  Runnable, MouseListener, MouseMotionListener, KeyListener{
     /**
      * Class fields defined in Simulator:
      * simthread = refresh thread
@@ -17,27 +18,24 @@ public class Simulator extends  JApplet implements  Runnable, MouseListener, Mou
     private Thread simthread;
     private int iters = 0;
     private Canvas canvas;
-    private Graphics buffG;
-    private Image buff;
+    private Graphics2D buffG;
+    private BufferedImage buff;
     /**
      * Initialize the applet.
      */
-    public void init() {
-        canvas = new Canvas(getWidth(), getHeight());
-        getContentPane().add(canvas);
+    public Simulator() {   
+        setFocusable(true);
+        canvas = new Canvas(700, 500);
+        add(canvas);
         addMouseListener(this);
         addMouseMotionListener(this);
         addKeyListener(this);
-        buff = createImage(getWidth(), getHeight());
-        buffG = buff.getGraphics();
+        simthread = new Thread(this);
+        simthread.start();
     }
     /**
      * Start the refresh thread.
      */
-    public void start() {
-        simthread = new Thread(this);
-        simthread.start();
-    }
     /**
      * Iterate the physics, call repaint().
      */
@@ -53,7 +51,7 @@ public class Simulator extends  JApplet implements  Runnable, MouseListener, Mou
             canvas.iters = this.iters;
             repaint();
             try {
-                simthread.sleep(10);
+                simthread.sleep(1);
                 this.iters++;
             } catch(InterruptedException ie) {System.out.println("!!");}
         }
@@ -62,10 +60,8 @@ public class Simulator extends  JApplet implements  Runnable, MouseListener, Mou
      * Paint the drawing surface on the applet.
      * @param   g   A graphics object
      */
-    public void paint(Graphics g) {
-        buffG.clearRect(0,0,getWidth(), getHeight());
-        canvas.paint(buffG);
-        g.drawImage(buff,0,0,this);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
     /**
      * Update the graphics by just painting
@@ -138,5 +134,22 @@ public class Simulator extends  JApplet implements  Runnable, MouseListener, Mou
      */
     public void keyTyped(KeyEvent ke) {
         canvas.keyType(ke.getKeyCode());
+    }    
+    private static void createAndShowGUI() {
+        JFrame frame = new JFrame("BorderDemo");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        Simulator c = new Simulator();
+        c.setOpaque(true); 
+        frame.setContentPane(c);
+        frame.pack();
+        frame.setVisible(true);
     }
-}    
+
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+    }
+}

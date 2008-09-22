@@ -66,8 +66,9 @@ public class Canvas extends JComponent {
         this.env = env;
         env[0] = gravity;
         env[1] = friction;
-        env[0] = (Math.pow(2,env[0])-1)*2;
-        env[1] = Math.pow(2,env[1])-1;
+        //env[0] = (Math.pow(2,env[0])-1)*2;
+        //env[1] = Math.pow(2,env[1])-1;
+        Vector objs = (Vector)objects.clone();
         if(startY > env[2] - 30) {
             if(dragging) {
                 if(startX >= 5 && startX <= 105) {
@@ -93,7 +94,7 @@ public class Canvas extends JComponent {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
-            for(Object o: objects) {
+            for(Object o: objs) {
                 if( ((PhysObject)o).dist(mouX, mouY) < 20) {
                     closeEnough = true;
                     if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
@@ -105,13 +106,13 @@ public class Canvas extends JComponent {
             if(closeEnough) {
                 massDragged = min;                    
                 draggingMass = true;
-                ((Mass)objects.elementAt(min)).selected = true;          
+                ((Mass)objs.elementAt(min)).selected = true;          
             }
         }  else if(ctrlb && pressed && !deleted) {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
-            for(Object o: objects) {
+            for(Object o: objs) {
                 if( ((PhysObject)o).dist(mouX, mouY) < 20) {
                     closeEnough = true;
                     if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
@@ -121,7 +122,7 @@ public class Canvas extends JComponent {
                 i++;
             }
             if(closeEnough) {
-                objects.remove(objects.elementAt(min));
+                objs.remove(objects.elementAt(min));
                 deleted = true;
             }
         }  
@@ -129,7 +130,7 @@ public class Canvas extends JComponent {
             ((Mass)objects.elementAt(massDragged)).x = mouX-3;
             ((Mass)objects.elementAt(massDragged)).y = mouY-3;
         }       
-        for(Object o:objects) {
+        for(Object o:objs) {
             PhysObject obj = (PhysObject)o;
             obj.setEnv(env);
             try {
@@ -142,6 +143,7 @@ public class Canvas extends JComponent {
                 }
             } catch (Exception e) {}
         }
+        objects = objs;
             
     }
     /**
@@ -177,6 +179,7 @@ public class Canvas extends JComponent {
         g.setColor(Color.black);
         g.drawLine((int)(100*friction)+155, this.height-26,(int)(100*friction)+155, this.height-1);
         g.drawString("G",110,this.height-14);
+        g.drawString("F",265,this.height-14);
     }
     /**
      * React to the mouse being moved

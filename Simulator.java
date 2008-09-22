@@ -53,7 +53,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
             try {
                 simthread.sleep(1);
                 this.iters++;
-            } catch(InterruptedException ie) {System.out.println("!!");}
+            } catch(Exception ie) {System.out.println(ie.getMessage());}
         }
     }
     /**

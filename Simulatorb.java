@@ -55,8 +55,7 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
             try {
                 simthread.sleep(1);
                 this.iters++;
-            } catch(InterruptedException ie) {System.out.println("!!");}
-        }
+            } catch(Exception e) {System.out.println("!!");}}
     }
     /**
      * Paint the drawing surface on the applet.

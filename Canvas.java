@@ -9,7 +9,7 @@ import java.util.regex.*;
  * 
  * @author Colin Stanfill
  */
-public class Canvas extends JComponent {
+public class Canvas extends JComponent implements Runnable{
     /**
      * Class fields defined in Canvas
      * 
@@ -29,10 +29,11 @@ public class Canvas extends JComponent {
      * mode, massMode = current mode and what kind of mass are being made
      * key = what key was most recently pressed
      */
+    private int iters = 0;
     private String debug = "";
     private Vector objects;
     private double[] env;
-    public int iters;
+
     private int startX, startY, endX, endY;
     private boolean dragging = false, draggingMass, pressed = false;
     private boolean isRight = false;
@@ -45,6 +46,8 @@ public class Canvas extends JComponent {
     private int key = 0;
     private int width, height;
     private double gravity=0.3, friction = 0.0;
+    private MyToggleable modetoggle = new MyToggleable(300, 469, 50, 15, "SIM", "CON");
+    private MyToggleable masstoggle = new MyToggleable(300, 484, 50, 15, "FREE", "FIX");
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -63,7 +66,25 @@ public class Canvas extends JComponent {
      * 
      * @param   env     The environmental variables - gravity, friction, height, width
      */
+    public void setEnv(double [] env) {
+        this.env = env;
+    }
+    public void run() {
+        this.iterate(env);
+    }
     public void iterate(double[] env) {
+        //iters++;
+        //System.out.println(iters + "!");
+        if(modetoggle.getState() == modetoggle.STATE_A) {
+            mode = SIMULATE;
+        } else {
+            mode = CONSTRUCT;
+        }
+        if(masstoggle.getState() == masstoggle.STATE_A) {
+            massMode = FREE_MASS;
+        } else {
+            massMode = FIXED_MASS;
+        }
         if(!pressed) {
             mouseb = NONE;
             mask = NONE;
@@ -86,7 +107,7 @@ public class Canvas extends JComponent {
         this.env = env;
         env[0] = gravity;
         env[1] = friction;
-        //env[0] = (Math.pow(2,env[0])-1)*2;
+        env[0] = (Math.pow(2,env[0])-1)*4;
         //env[1] = Math.pow(2,env[1])-1;
         Vector objs = (Vector)objects.clone();
         if(startY > height - 30) {
@@ -172,11 +193,11 @@ public class Canvas extends JComponent {
      * @param   g       A graphics object
      */
     public void paintComponent(Graphics g){
-        iterate(env);
+        //iterate(env);
         for(Object o:objects) {
             ((PhysObject)o).paintObject(g);
         }
-        if(mouseb == MOVE && mouX > height - 30) {
+        if(mouseb == MOVE && mouY < height - 30) {
             g.setColor(new Color(200, 200, 200));
             g.drawLine(startX, startY, mouX, mouY);
             g.drawOval(startX-3, startY-3, 6, 6);
@@ -203,29 +224,6 @@ public class Canvas extends JComponent {
         g.drawRect(300,this.height-31, 50, 15);
         g.drawRect(300,this.height-16, 50, 15);
         g.setColor(Color.white);
-        if(mode == SIMULATE) {
-            g.setColor(Color.gray);
-        }
-        g.fillRect(301, this.height-30, 49, 14);
-        g.setColor(Color.gray);
-        if(massMode == FIXED_MASS) {
-            g.setColor(Color.white);
-        }
-        g.fillRect(301, this.height-15, 49, 14);
-        if(mode == SIMULATE) {
-            g.setColor(Color.white);
-            g.drawString("SIM", 315, this.height-18);
-        } else {
-            g.setColor(Color.black);
-            g.drawString("CON", 312, this.height-18);
-        }
-        if(massMode == FIXED_MASS) {
-            g.setColor(Color.black);
-            g.drawString("FIX",315, this.height-3);
-        } else {
-            g.setColor(Color.white);
-            g.drawString("FRE",315, this.height-3);
-        }
         g.setColor(Color.black);
         g.drawRect(350, this.height-31, 50,15);
         g.drawRect(350, this.height-16, 50,15);
@@ -288,6 +286,8 @@ public class Canvas extends JComponent {
         g.drawString("move",360,this.height-3);
         g.drawString("grab",413,this.height-19);
         g.drawString("del",416, this.height-3);
+        masstoggle.paintComponent(g);
+        modetoggle.paintComponent(g);
     }
     /**
      * React to the mouse being moved
@@ -295,14 +295,16 @@ public class Canvas extends JComponent {
      * @param   x       The x coordinate of the mouse
      * @param   y       The y coordinate of the mouse
      */
-    public void mouseMove(int x, int y) {            
+    public void mouseMove(int x, int y) {   
         if(pressed) {
             dragging = true;
         }
         mouX = x;
         mouY = y;
     }
-    public void mousePress(int x, int y, boolean isR) {
+    public void mousePress(int x, int y, boolean isR) {   
+        modetoggle.mousePressed(x, y);
+        masstoggle.mousePressed(x, y);
         startX = x;
         startY = y;
         isRight = isR;
@@ -322,7 +324,9 @@ public class Canvas extends JComponent {
     public boolean inRect(int x, int y, int w, int h, int mx, int my) {
         return (startX < x + w && startX > x && startY < y + h && startY > y && mx < x + w && mx > x && my < y+h && my > y);
     }
-    public void mouseRelease(int x, int y, boolean isR) {
+    public void mouseRelease(int x, int y, boolean isR) {   
+        modetoggle.mouseReleased(x,y);
+        masstoggle.mouseReleased(x,y);
         dragging = false;
         pressed = false;
         if(startY > height - 30) {
@@ -333,9 +337,6 @@ public class Canvas extends JComponent {
             shiftb = false;
             ctrlb = false;
             deleted = false;
-            if(inRect(255,height-31,100,15,x,y)) {
-                mode = 1-mode;
-            }
             if(inRect(350, height-31, 50, 15, x, y)) {
                 if(mask == LEFTCL) {
                     leftcl = STAT;
@@ -379,9 +380,6 @@ public class Canvas extends JComponent {
                 } else {
                     rightcl = DEL;
                 }
-            }
-            if(inRect(300, height-16, 50, 15, x, y)) {
-                massMode = 1 - massMode;
             }
             return;
         }
@@ -450,11 +448,23 @@ public class Canvas extends JComponent {
             mode = CONSTRUCT;
             massMode = FREE_MASS;
         }
-        if(k == KeyEvent.VK_S) {            
-            save("test");
+        if(k == KeyEvent.VK_S) {  
+            int temp = mode;
+            mode = CONSTRUCT;
+            Frame f = new Frame();
+            FileDialog fd = new FileDialog(f, "Save a file...", FileDialog.SAVE);
+            fd.setVisible(true);
+            save(fd.getDirectory() + fd.getFile());
+            mode = temp;
         }
         if(k == KeyEvent.VK_L) {
-            load("test");
+            int temp = mode;
+            mode = CONSTRUCT;
+            Frame f = new Frame();
+            FileDialog fd = new FileDialog(f, "Load a file...", FileDialog.LOAD);
+            fd.setVisible(true);
+            load(fd.getDirectory() + fd.getFile());
+            mode = temp;
         }
     }
     public void keyType(int k) {
@@ -469,7 +479,7 @@ public class Canvas extends JComponent {
     public void load(String name) {
         try {
             objects = new Vector();
-            InputStream fin = new FileInputStream(name + ".xml");
+            InputStream fin = new FileInputStream(name);
             InputStreamReader in = new InputStreamReader(fin, "8859_1");    
             StringBuffer sb = new StringBuffer();
             Reader reader = new InputStreamReader(fin, "8859_1");
@@ -514,7 +524,6 @@ public class Canvas extends JComponent {
                             
                             j = 0;
                         }
-                        System.out.println(fit.group(i));
                     }
                 }  
             }
@@ -525,7 +534,7 @@ public class Canvas extends JComponent {
     }
     public void save(String name) {
         try {
-            OutputStream fout = new FileOutputStream(name + ".xml");
+            OutputStream fout = new FileOutputStream(name);
             BufferedOutputStream bout = new BufferedOutputStream(fout);
             OutputStreamWriter out = new OutputStreamWriter(bout, "8859_1");
             out.write("<?xml version=\"1.0\" ");

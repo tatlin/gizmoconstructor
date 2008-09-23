@@ -8,6 +8,7 @@ import java.awt.image.*;
  * @version 3.1.4
  */
 public class Simulator extends JPanel implements  Runnable, MouseListener, MouseMotionListener, KeyListener{
+    private double[] env = new double[4];
     /**
      * Class fields defined in Simulator:
      * simthread = refresh thread
@@ -15,7 +16,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
      * canvas = drawing surface for everything
      * buff and buffG = buffered graphics variables
      */
-    private Thread simthread;
+    private Thread simthread, canvasthread;
     private int iters = 0;
     private Canvas canvas;
     private Graphics2D buffG;
@@ -31,6 +32,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
         addMouseMotionListener(this);
         addKeyListener(this);
         simthread = new Thread(this);
+        canvasthread = new Thread(canvas);
         simthread.start();
         this.setBackground(Color.white);
     }
@@ -43,18 +45,16 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
     public void run() {
         while(true) {
             repaint();
-            double[] env = new double[4]; //env = {gravity, friction, height, width}
-            env[0] = 0.3;
-            env[1] = 0.0;
             env[2] = getHeight();
             env[3] = getWidth();
-            canvas.iterate(env);
-            canvas.iters = this.iters;
-            repaint();
             try {
-                simthread.sleep(1);
-                this.iters++;
-            } catch(Exception ie) {System.out.println(ie.getMessage());}
+                canvas.setEnv(env);
+                simthread.sleep(10);
+                canvasthread.run();
+                canvasthread.join();                
+                //this.iters++;
+            } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
+            //System.out.println(iters + "!!");
         }
     }
     /**

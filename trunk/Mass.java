@@ -5,7 +5,7 @@ public class Mass extends PhysObject{
     private double[] env = new double[4];
     private boolean mouseOver = false;
     public boolean selected = false;
-    private double stepmult = 20;
+    private double stepmult = 2;
     private int bX = 15, bY = 45;
     public Mass() {}
     public Mass(double x, double y) {

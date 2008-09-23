@@ -14,7 +14,8 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
      * canvas = drawing surface for everything
      * buff and buffG = buffered graphics variables
      */
-    private Thread simthread;
+    private double[] env = new double[4];
+    private Thread simthread, canvasthread;
     private int iters = 0;
     private Canvas canvas;
     private Graphics buffG;
@@ -30,6 +31,7 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
         addKeyListener(this);
         buff = createImage(getWidth(), getHeight());
         buffG = buff.getGraphics();
+        canvasthread = new Thread(canvas);
     }
     /**
      * Start the refresh thread.
@@ -44,18 +46,17 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
     public void run() {
         while(true) {
             repaint();
-            double[] env = new double[4]; //env = {gravity, friction, height, width}
-            env[0] = 0.3;
-            env[1] = 0.0;
             env[2] = getHeight();
             env[3] = getWidth();
-            canvas.iterate(env);
-            canvas.iters = this.iters;
-            repaint();
             try {
-                simthread.sleep(1);
-                this.iters++;
-            } catch(Exception e) {System.out.println("!!");}}
+                canvas.setEnv(env);
+                simthread.sleep(10);
+                canvasthread.run();
+                canvasthread.join();                
+                //this.iters++;
+            } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
+            //System.out.println(iters + "!!");
+        }
     }
     /**
      * Paint the drawing surface on the applet.

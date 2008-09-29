@@ -33,7 +33,7 @@ public class Canvas extends JComponent implements Runnable{
     private String debug = "";
     private Vector objects;
     private double[] env;
-
+    private Color lightblue = new Color(128, 128, 255);
     private int startX, startY, endX, endY;
     private boolean dragging = false, draggingMass, pressed = false;
     private boolean isRight = false;
@@ -42,12 +42,18 @@ public class Canvas extends JComponent implements Runnable{
     private int massDragged;
     private int mouX = 0, mouY = 0;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0, FIXED_MASS = 1, STAT = 0, MOVE = 1, GRAB = 2, DEL = 3, NONE = -1, RIGHTCL = 0, LEFTCL = 1, SHIFTL = 2, CTRLL = 3;
-    private int mode = SIMULATE, massMode = FREE_MASS, leftcl = MOVE, rightcl = STAT, shiftl = GRAB, ctrll = DEL, mouseb = -1, mask = -1;
+    private int mode = SIMULATE, massMode = FREE_MASS, leftcl = STAT, rightcl = MOVE, shiftl = GRAB, ctrll = DEL, mouseb = -1, mask = -1;
     private int key = 0;
     private int width, height;
     private double gravity=0.3, friction = 0.0;
+    private MySelector stat = new MySelector(350,469,50,15,0, "stat",0);
+    private MySelector move = new MySelector(350,484,50,15,2, "move",1);
+    private MySelector grab = new MySelector(400,469,50,15,1, "grab",2);
+    private MySelector del  = new MySelector(400,484,50,15,3, "del",3);
     private MyToggleable modetoggle = new MyToggleable(300, 469, 50, 15, "SIM", "CON");
     private MyToggleable masstoggle = new MyToggleable(300, 484, 50, 15, "FREE", "FIX");
+    private MySlider grav = new MySlider(5,474,25,100,30, "G");
+    private MySlider fric = new MySlider(155,474,25,100,0, "F");
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -110,27 +116,9 @@ public class Canvas extends JComponent implements Runnable{
         env[0] = (Math.pow(2,env[0])-1)*4;
         //env[1] = Math.pow(2,env[1])-1;
         Vector objs = (Vector)objects.clone();
+        gravity = (double)(grav.getValue())/100;
+        friction = (double)(fric.getValue())/100;
         if(startY > height - 30) {
-            if(dragging) {
-                if(startX >= 5 && startX <= 105) {
-                    gravity = ((double)mouX-5)/100;
-                    if(gravity > 1) {
-                        gravity = 1;
-                    }
-                    if(gravity < 0) {
-                        gravity = 0;
-                    }
-                }
-                if(startX >= 155 && startX <= 255) {
-                    friction = ((double)mouX-155)/100;
-                    if(friction > 1) {
-                        friction = 1;
-                    }
-                    if(friction < 0) {
-                        friction = 0;
-                    }
-                }
-            }
         } else if(mouseb == GRAB && !draggingMass) {
             int i = 0;
             int min = 0;
@@ -205,89 +193,14 @@ public class Canvas extends JComponent implements Runnable{
         }
         g.setColor(Color.black);
         g.drawRect(0,0, this.width-1, this.height-31);
-        g.drawRect(5,this.height-26,100,25);
-        g.setColor(Color.blue);
-        g.drawLine(5,this.height-13,(int)(100*gravity)+5, this.height-13);
-        g.setColor(Color.red);        
-        g.drawLine(105,this.height-13,(int)(100*gravity)+5, this.height-13);
-        g.setColor(Color.black);
-        g.drawLine((int)(100*gravity)+5, this.height-26,(int)(100*gravity)+5, this.height-1);
-        g.drawRect(155,this.height-26,100,25);
-        g.setColor(Color.blue);
-        g.drawLine(155,this.height-13,(int)(100*friction)+155, this.height-13);
-        g.setColor(Color.red);
-        g.drawLine(255,this.height-13,(int)(100*friction)+155, this.height-13);
-        g.setColor(Color.black);
-        g.drawLine((int)(100*friction)+155, this.height-26,(int)(100*friction)+155, this.height-1);
-        g.drawString("G",110,this.height-14);
-        g.drawString("F",265,this.height-14);
-        g.drawRect(300,this.height-31, 50, 15);
-        g.drawRect(300,this.height-16, 50, 15);
-        g.setColor(Color.white);
-        g.setColor(Color.black);
-        g.drawRect(350, this.height-31, 50,15);
-        g.drawRect(350, this.height-16, 50,15);
-        g.drawRect(400, this.height-31, 50,15);
-        g.drawRect(400, this.height-16, 50,15);
-        g.setColor(Color.red);
-        if(leftcl == STAT) {
-            g.fillOval(351,height-30, 5, 5);
-        }
-        if(leftcl == MOVE) {
-            g.fillOval(351,height-15, 5, 5);
-        }
-        if(leftcl == GRAB) {
-            g.fillOval(401,height-30, 5, 5);
-        }
-        if(leftcl == DEL) {
-            g.fillOval(401,height-15, 5, 5);
-        }
-        g.setColor(Color.blue);
-        if(rightcl == STAT) {
-            g.fillOval(395,height-30, 5, 5);
-        }
-        if(rightcl == MOVE) {
-            g.fillOval(395,height-15, 5, 5);
-        }
-        if(rightcl == GRAB) {
-            g.fillOval(445,height-30, 5, 5);
-        }
-        if(rightcl == DEL) {
-            g.fillOval(445,height-15, 5, 5);
-        }
-        g.setColor(Color.green);
-        if(shiftl == STAT) {
-            g.fillOval(351,height-20, 5, 5);
-        }
-        if(shiftl == MOVE) {
-            g.fillOval(351,height-5, 5, 5);
-        }
-        if(shiftl == GRAB) {
-            g.fillOval(401,height-20, 5, 5);
-        }
-        if(shiftl == DEL) {
-            g.fillOval(401,height-5, 5, 5);
-        }
-        g.setColor(Color.yellow);        
-        if(ctrll == STAT) {
-            g.fillOval(395,height-20, 5, 5);
-        }
-        if(ctrll == MOVE) {
-            g.fillOval(395,height-5, 5, 5);
-        }
-        if(ctrll == GRAB) {
-            g.fillOval(445,height-20, 5, 5);
-        }
-        if(ctrll == DEL) {
-            g.fillOval(445,height-5, 5, 5);
-        }
-        g.setColor(Color.black);
-        g.drawString("stat",364,this.height-19);
-        g.drawString("move",360,this.height-3);
-        g.drawString("grab",413,this.height-19);
-        g.drawString("del",416, this.height-3);
         masstoggle.paintComponent(g);
         modetoggle.paintComponent(g);
+        stat.paintComponent(g);
+        move.paintComponent(g);
+        grab.paintComponent(g);
+        del.paintComponent(g);
+        grav.paintComponent(g);
+        fric.paintComponent(g);
     }
     /**
      * React to the mouse being moved
@@ -305,6 +218,12 @@ public class Canvas extends JComponent implements Runnable{
     public void mousePress(int x, int y, boolean isR) {   
         modetoggle.mousePressed(x, y);
         masstoggle.mousePressed(x, y);
+        stat.mousePress(x,y);
+        move.mousePress(x,y);
+        grab.mousePress(x,y);
+        del.mousePress(x,y);
+        grav.mousePress(x,y);
+        fric.mousePress(x,y);
         startX = x;
         startY = y;
         isRight = isR;
@@ -317,6 +236,8 @@ public class Canvas extends JComponent implements Runnable{
         }
     }
     public void mouseDrag(int x, int y, boolean isR) {
+        grav.mouseDrag(x,y);
+        fric.mouseDrag(x,y);
         dragging = true;
         mouX = x;
         mouY = y;
@@ -327,6 +248,22 @@ public class Canvas extends JComponent implements Runnable{
     public void mouseRelease(int x, int y, boolean isR) {   
         modetoggle.mouseReleased(x,y);
         masstoggle.mouseReleased(x,y);
+        int[] sofar = new int[4];
+        if((stat.inRect(x,y) || move.inRect(x,y)) || grab.inRect(x,y) || del.inRect(x,y)) {
+            stat.mouseRelease(x,y,mask);
+            sofar = stat.getButtons(sofar);
+            move.mouseRelease(x,y,mask);
+            sofar = move.getButtons(sofar);
+            grab.mouseRelease(x,y,mask);
+            sofar = grab.getButtons(sofar);
+            del.mouseRelease(x,y,mask);
+            sofar = del.getButtons(sofar);
+            leftcl = sofar[0];
+            rightcl = sofar[1];
+            shiftl = sofar[2];
+            ctrll = sofar[3];
+            return;
+        }
         dragging = false;
         pressed = false;
         if(startY > height - 30) {
@@ -337,50 +274,6 @@ public class Canvas extends JComponent implements Runnable{
             shiftb = false;
             ctrlb = false;
             deleted = false;
-            if(inRect(350, height-31, 50, 15, x, y)) {
-                if(mask == LEFTCL) {
-                    leftcl = STAT;
-                } else if(mask == SHIFTL) {
-                    shiftl = STAT;
-                } else if(mask == CTRLL) {
-                    ctrll = STAT;
-                } else {
-                    rightcl = STAT;
-                }
-            }
-            if(inRect(350, height-16, 50, 15, x, y)) {
-                if(mask == LEFTCL) {
-                    leftcl = MOVE;
-                } else if(mask == SHIFTL) {
-                    shiftl = MOVE;
-                } else if(mask == CTRLL) {
-                    ctrll = MOVE;
-                } else {
-                    rightcl = MOVE;
-                }
-            }
-            if(inRect(400, height-31, 50, 15, x, y)) {
-                if(mask == LEFTCL) {
-                    leftcl = GRAB;
-                } else if(mask == SHIFTL) {
-                    shiftl = GRAB;
-                } else if(mask == CTRLL) {
-                    ctrll = GRAB;
-                } else {
-                    rightcl = GRAB;
-                }
-            }
-            if(inRect(400, height-16, 50, 15, x, y)) {
-                if(mask == LEFTCL) {
-                    leftcl = DEL;
-                } else if(mask == SHIFTL) {
-                    shiftl = DEL;
-                } else if(mask == CTRLL) {
-                    ctrll = DEL;
-                } else {
-                    rightcl = DEL;
-                }
-            }
             return;
         }
         if(mouseb == GRAB) {

@@ -31,7 +31,7 @@ public class Canvas extends JComponent implements Runnable{
      */
     private int iters = 0;
     private String debug = "";
-    private Vector objects;
+    private Vector springs, masses;
     private double[] env;
     private Color lightblue = new Color(128, 128, 255);
     private int startX, startY, endX, endY;
@@ -53,7 +53,9 @@ public class Canvas extends JComponent implements Runnable{
     private MyToggleable modetoggle = new MyToggleable(300, 469, 50, 15, "SIM", "CON");
     private MyToggleable masstoggle = new MyToggleable(300, 484, 50, 15, "FREE", "FIX");
     private MySlider grav = new MySlider(5,474,25,100,30, "G");
-    private MySlider fric = new MySlider(155,474,25,100,0, "F");
+    private MySlider fric = new MySlider(120,474,25,100,0, "F");
+    private MyButton save = new MyButton(240,469,50,15, "SAVE");
+    private MyButton load = new MyButton(240,484,50,15, "LOAD");
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -65,10 +67,17 @@ public class Canvas extends JComponent implements Runnable{
         this.height = height;
         setPreferredSize(new Dimension(width, height));
         setBackground(Color.white);
-        objects = new Vector();
+        masses = new Vector();
+        springs = new Vector();
+        Mass m = new Mass(40,40, 10,10);
+        Mass n = new Mass(70,70,15,15);
+        Spring s = new Spring(m,n);
+        springs.add(s);
+        masses.add(m);
+        masses.add(n);
     }
     /**
-     * Iterate the physobjects in the objects vector
+     * Iterate the physmasses in the masses vector
      * 
      * @param   env     The environmental variables - gravity, friction, height, width
      */
@@ -115,7 +124,8 @@ public class Canvas extends JComponent implements Runnable{
         env[1] = friction;
         env[0] = (Math.pow(2,env[0])-1)*4;
         //env[1] = Math.pow(2,env[1])-1;
-        Vector objs = (Vector)objects.clone();
+        Vector mas = (Vector)masses.clone();
+        Vector sps = (Vector)springs.clone();
         gravity = (double)(grav.getValue())/100;
         friction = (double)(fric.getValue())/100;
         if(startY > height - 30) {
@@ -123,10 +133,10 @@ public class Canvas extends JComponent implements Runnable{
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
-            for(Object o: objs) {
+            for(Object o: mas) {
                 if( ((PhysObject)o).dist(mouX, mouY) < 20) {
                     closeEnough = true;
-                    if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
+                    if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)masses.elementAt(min)).dist(mouX, mouY)) {
                         min = i;
                     }
                 }
@@ -135,31 +145,34 @@ public class Canvas extends JComponent implements Runnable{
             if(closeEnough) {
                 massDragged = min;                    
                 draggingMass = true;
-                ((Mass)objs.elementAt(min)).selected = true;          
+                ((Mass)mas.elementAt(min)).selected = true;          
             }
         }  else if(mouseb == DEL && !deleted) {
             int i = 0;
             int min = 0;
             boolean closeEnough = false;
-            for(Object o: objs) {
+            for(Object o: mas) {
                 if( ((PhysObject)o).dist(mouX, mouY) < 20) {
                     closeEnough = true;
-                    if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
+                    if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)masses.elementAt(min)).dist(mouX, mouY)) {
                         min = i;
                     }
                 }
                 i++;
             }
             if(closeEnough) {
-                objs.remove(objects.elementAt(min));
+                mas.remove(masses.elementAt(min));
                 deleted = true;
             }
         }  
         if(draggingMass) {
-            ((Mass)objects.elementAt(massDragged)).x = mouX-3;
-            ((Mass)objects.elementAt(massDragged)).y = mouY-3;
-        }       
-        for(Object o:objs) {
+            ((Mass)masses.elementAt(massDragged)).x = mouX-3;
+            ((Mass)masses.elementAt(massDragged)).y = mouY-3;
+        }      
+        for(Object o:sps) {
+            ((PhysObject)o).move();
+        }
+        for(Object o:mas) {
             PhysObject obj = (PhysObject)o;
             obj.setEnv(env);
             try {
@@ -172,17 +185,20 @@ public class Canvas extends JComponent implements Runnable{
                 }
             } catch (Exception e) {}
         }
-        objects = objs;
+        masses = mas;
             
     }
     /**
-     * Paints the canvas and all of the objects on it
+     * Paints the canvas and all of the masses on it
      * 
      * @param   g       A graphics object
      */
     public void paintComponent(Graphics g){
         //iterate(env);
-        for(Object o:objects) {
+        for(Object o:masses) {
+            ((PhysObject)o).paintObject(g);
+        }
+        for(Object o:springs) {
             ((PhysObject)o).paintObject(g);
         }
         if(mouseb == MOVE && mouY < height - 30) {
@@ -201,6 +217,8 @@ public class Canvas extends JComponent implements Runnable{
         del.paintComponent(g);
         grav.paintComponent(g);
         fric.paintComponent(g);
+        save.paintComponent(g);
+        load.paintComponent(g);
     }
     /**
      * React to the mouse being moved
@@ -214,6 +232,8 @@ public class Canvas extends JComponent implements Runnable{
         }
         mouX = x;
         mouY = y;
+        save.mouseMove(x,y);
+        load.mouseMove(x,y);
     }
     public void mousePress(int x, int y, boolean isR) {   
         modetoggle.mousePressed(x, y);
@@ -224,6 +244,8 @@ public class Canvas extends JComponent implements Runnable{
         del.mousePress(x,y);
         grav.mousePress(x,y);
         fric.mousePress(x,y);
+        save.mousePress(x,y);
+        load.mousePress(x,y);
         startX = x;
         startY = y;
         isRight = isR;
@@ -248,6 +270,14 @@ public class Canvas extends JComponent implements Runnable{
     public void mouseRelease(int x, int y, boolean isR) {   
         modetoggle.mouseReleased(x,y);
         masstoggle.mouseReleased(x,y);
+        if(save.getPressed()) {
+            saveF();
+        }
+        save.mouseRelease(x,y);
+        if(load.getPressed()) { 
+            loadF();
+        }
+        load.mouseRelease(x,y);
         int[] sofar = new int[4];
         if((stat.inRect(x,y) || move.inRect(x,y)) || grab.inRect(x,y) || del.inRect(x,y)) {
             stat.mouseRelease(x,y,mask);
@@ -269,7 +299,7 @@ public class Canvas extends JComponent implements Runnable{
         if(startY > height - 30) {
             draggingMass = false;
             if(draggingMass) {
-                ((Mass)objects.elementAt(massDragged)).selected = false;
+                ((Mass)masses.elementAt(massDragged)).selected = false;
             }
             shiftb = false;
             ctrlb = false;
@@ -278,26 +308,26 @@ public class Canvas extends JComponent implements Runnable{
         }
         if(mouseb == GRAB) {
             if(draggingMass) {
-                ((Mass)objects.elementAt(massDragged)).selected = false;
+                ((Mass)masses.elementAt(massDragged)).selected = false;
                 draggingMass = false;
             }
         }
         if(mouseb == STAT) {
             if(massMode == FIXED_MASS) {
                 Fmass mass = new Fmass(x,y);
-                objects.add(mass);
+                masses.add(mass);
             } else {
                 Mass mass = new Mass(x, y);
-                objects.add(mass);
+                masses.add(mass);
             }           
         }
         if (mouseb == MOVE) {
             if(massMode == FIXED_MASS) {
                 Fmass mass = new Fmass(x,y);
-                objects.add(mass);
+                masses.add(mass);
             } else {
                 Mass mass = new Mass(x, y, (x-startX)*0.1, (y-startY)*0.1);
-                objects.add(mass);
+                masses.add(mass);
             }
         }
         shiftb = false;
@@ -337,27 +367,15 @@ public class Canvas extends JComponent implements Runnable{
             mode = 1-mode;
         }
         if(k == KeyEvent.VK_C) {
-            objects = new Vector();
+            masses = new Vector();
             mode = CONSTRUCT;
             massMode = FREE_MASS;
         }
         if(k == KeyEvent.VK_S) {  
-            int temp = mode;
-            mode = CONSTRUCT;
-            Frame f = new Frame();
-            FileDialog fd = new FileDialog(f, "Save a file...", FileDialog.SAVE);
-            fd.setVisible(true);
-            save(fd.getDirectory() + fd.getFile());
-            mode = temp;
+            saveF();
         }
         if(k == KeyEvent.VK_L) {
-            int temp = mode;
-            mode = CONSTRUCT;
-            Frame f = new Frame();
-            FileDialog fd = new FileDialog(f, "Load a file...", FileDialog.LOAD);
-            fd.setVisible(true);
-            load(fd.getDirectory() + fd.getFile());
-            mode = temp;
+            loadF();
         }
     }
     public void keyType(int k) {
@@ -369,9 +387,24 @@ public class Canvas extends JComponent implements Runnable{
             }
         }
     }
-    public void load(String name) {
+    public void loadF() {
+        boolean tempm = modetoggle.getState();
+        if(!modetoggle.getState()) {
+            modetoggle.toggle();
+        }
+        Frame f = new Frame();
+        FileDialog fd = new FileDialog(f, "Load a file...", FileDialog.LOAD);
+        fd.setVisible(true);
+        if(fd.getFile() != null) {
+            loadFile(fd.getDirectory() + fd.getFile());
+        }
+        if(!tempm) {
+            modetoggle.toggle();
+        }
+    }        
+    public void loadFile(String name) {
         try {
-            objects = new Vector();
+            masses = new Vector();
             InputStream fin = new FileInputStream(name);
             InputStreamReader in = new InputStreamReader(fin, "8859_1");    
             StringBuffer sb = new StringBuffer();
@@ -409,10 +442,10 @@ public class Canvas extends JComponent implements Runnable{
                         if(j == 6) {
                             if(!fixed) {
                                 Mass m = new Mass(x, y, vX, vY);
-                                objects.add(m);
+                                masses.add(m);
                             } else {
                                 Fmass m = new Fmass(x,y);
-                                objects.add(m);
+                                masses.add(m);
                             }
                             
                             j = 0;
@@ -425,7 +458,22 @@ public class Canvas extends JComponent implements Runnable{
             System.out.println(e.getMessage());
         }
     }
-    public void save(String name) {
+    public void saveF() {
+        boolean tempm = modetoggle.getState();
+        if(!modetoggle.getState()) {
+            modetoggle.toggle();
+        }
+        Frame f = new Frame();
+        FileDialog fd = new FileDialog(f, "Save a file...", FileDialog.SAVE);
+        fd.setVisible(true);
+        if(fd.getFile() != null) {
+            saveFile(fd.getDirectory() + fd.getFile());
+        }
+        if(!tempm) {
+            modetoggle.toggle();
+        }
+    }
+    public void saveFile(String name) {
         try {
             OutputStream fout = new FileOutputStream(name);
             BufferedOutputStream bout = new BufferedOutputStream(fout);
@@ -433,9 +481,9 @@ public class Canvas extends JComponent implements Runnable{
             out.write("<?xml version=\"1.0\" ");
             out.write("encoding=\"ISO-8859-1\"?>\r\n");
             out.write("<Objects g=" + gravity + " f=" + friction + ">\r\n"); 
-            for(Object o: objects) {
+            for(Object o: masses) {
                 if(o instanceof Mass) {
-                    out.write("  <mass x=" + ((Mass)o).x + " y=" + ((Mass)o).y + " vX=" + ((Mass)o).vX + " vY=" + ((Mass)o).vY + " fixed=" + (o instanceof Fmass) + ">" );
+                    out.write("  <mass x=" + ((Mass)o).getX() + " y=" + ((Mass)o).getY() + " vX=" + ((Mass)o).getVX() + " vY=" + ((Mass)o).getVY() + " fixed=" + (o instanceof Fmass) + ">" );
                     out.write("</mass>\n");
                 }
             }

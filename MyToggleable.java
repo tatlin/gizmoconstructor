@@ -43,4 +43,7 @@ public class MyToggleable {
     public boolean getState() {
         return state;
     }
+    public void toggle() {
+        state = !state;
+    }
 }

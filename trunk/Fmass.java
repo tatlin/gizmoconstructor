@@ -7,8 +7,6 @@ public class Fmass extends Mass {
     public Fmass(double x, double y, double vX, double vY) {
         this.x = x;
         this.y = y;
-        this.vX = vX;
-        this.vY = vY;
     }
     public void move() {}
     public void paintObject(Graphics g) {

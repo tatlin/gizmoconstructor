@@ -35,11 +35,11 @@ public class Canvas extends JComponent implements Runnable{
     private double[] env;
     private Color lightblue = new Color(128, 128, 255);
     private int startX, startY, endX, endY;
-    private boolean dragging = false, draggingMass, pressed = false;
+    private boolean dragging = false, draggingMass, pressed = false, selectedMass = false;
     private boolean isRight = false;
     private boolean shift, ctrl, shiftb = false, ctrlb = false;
     private boolean deleted = false;
-    private int massDragged;
+    private int massDragged, massSelected = 0;
     private int mouX = 0, mouY = 0;
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0, FIXED_MASS = 1, STAT = 0, MOVE = 1, GRAB = 2, DEL = 3, NONE = -1, RIGHTCL = 0, LEFTCL = 1, SHIFTL = 2, CTRLL = 3;
     private int mode = SIMULATE, massMode = FREE_MASS, leftcl = STAT, rightcl = MOVE, shiftl = GRAB, ctrll = DEL, mouseb = -1, mask = -1;
@@ -83,6 +83,12 @@ public class Canvas extends JComponent implements Runnable{
      */
     public void setEnv(double [] env) {
         this.env = env;
+        for(Object o: masses) {
+            ((Mass)o).setEnv(env);
+        }
+        for(Object o: springs) {
+            ((Spring)o).setEnv(env);
+        }
     }
     public void run() {
         this.iterate(env);
@@ -99,6 +105,10 @@ public class Canvas extends JComponent implements Runnable{
             massMode = FREE_MASS;
         } else {
             massMode = FIXED_MASS;
+        }
+        if(mode == SIMULATE) {
+            selectedMass = false;
+            ((Mass)masses.elementAt(massSelected)).selected = false;
         }
         if(!pressed) {
             mouseb = NONE;
@@ -164,11 +174,11 @@ public class Canvas extends JComponent implements Runnable{
                 mas.remove(masses.elementAt(min));
                 deleted = true;
             }
-        }  
+        }    
         if(draggingMass) {
-            ((Mass)masses.elementAt(massDragged)).x = mouX-3;
-            ((Mass)masses.elementAt(massDragged)).y = mouY-3;
-        }      
+            ((Mass)mas.elementAt(massDragged)).x = mouX-3;
+            ((Mass)mas.elementAt(massDragged)).y = mouY-3;
+        }    
         for(Object o:sps) {
             ((PhysObject)o).move();
         }
@@ -206,6 +216,11 @@ public class Canvas extends JComponent implements Runnable{
             g.drawLine(startX, startY, mouX, mouY);
             g.drawOval(startX-3, startY-3, 6, 6);
             g.drawOval(mouX-3, mouY-3, 6, 6);
+        }
+        if(selectedMass) {
+            g.setColor(Color.blue);
+            Mass m = ((Mass)masses.elementAt(massSelected));
+            g.drawLine((int)m.x+3, (int)m.y+3, mouX-3, mouY-3);
         }
         g.setColor(Color.black);
         g.drawRect(0,0, this.width-1, this.height-31);
@@ -267,7 +282,7 @@ public class Canvas extends JComponent implements Runnable{
     public boolean inRect(int x, int y, int w, int h, int mx, int my) {
         return (startX < x + w && startX > x && startY < y + h && startY > y && mx < x + w && mx > x && my < y+h && my > y);
     }
-    public void mouseRelease(int x, int y, boolean isR) {   
+    public void mouseRelease(int x, int y, boolean isR) { 
         modetoggle.mouseReleased(x,y);
         masstoggle.mouseReleased(x,y);
         if(save.getPressed()) {
@@ -297,10 +312,10 @@ public class Canvas extends JComponent implements Runnable{
         dragging = false;
         pressed = false;
         if(startY > height - 30) {
-            draggingMass = false;
             if(draggingMass) {
                 ((Mass)masses.elementAt(massDragged)).selected = false;
             }
+            draggingMass = false;
             shiftb = false;
             ctrlb = false;
             deleted = false;
@@ -313,7 +328,50 @@ public class Canvas extends JComponent implements Runnable{
             }
         }
         if(mouseb == STAT) {
-            if(massMode == FIXED_MASS) {
+            if(mode == CONSTRUCT) {
+                int i = 0;
+                int min = 0;
+                boolean closeEnough = false;
+                for(Object o: masses) {
+                    if( ((PhysObject)o).dist(mouX, mouY) < 20) {
+                        closeEnough = true;
+                        if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)masses.elementAt(min)).dist(mouX, mouY)) {
+                            min = i;
+                        }
+                    }
+                    i++;
+                }
+                if(closeEnough) {
+                    if(selectedMass) {
+                        Spring s = new Spring((Mass)masses.elementAt(min), (Mass)masses.elementAt(massSelected));
+                        springs.add(s);
+                        selectedMass = false;
+                        ((Mass)masses.elementAt(massSelected)).selected = false;
+                    } else {
+                        massSelected = min;
+                        selectedMass = true;
+                        ((Mass)masses.elementAt(min)).selected = true; 
+                    }
+                } else {
+                    if(selectedMass) {
+                        Mass mass = new Mass(x, y);
+                        if(massMode == FIXED_MASS) {
+                            mass = new Fmass(x, y);
+                        }
+                        Spring s = new Spring(mass, (Mass)masses.elementAt(massSelected));
+                        springs.add(s);
+                        masses.add(mass);
+                        selectedMass = false;
+                        ((Mass)masses.elementAt(massSelected)).selected = false;
+                    } else if(massMode == FIXED_MASS) {
+                        Fmass mass = new Fmass(x,y);
+                        masses.add(mass);
+                    } else {
+                        Mass mass = new Mass(x, y);
+                        masses.add(mass);
+                    }    
+                }
+            } else if(massMode == FIXED_MASS) {
                 Fmass mass = new Fmass(x,y);
                 masses.add(mass);
             } else {
@@ -322,7 +380,12 @@ public class Canvas extends JComponent implements Runnable{
             }           
         }
         if (mouseb == MOVE) {
-            if(massMode == FIXED_MASS) {
+            if(mode == CONSTRUCT) {
+                if(selectedMass) {
+                    selectedMass = false;
+                    ((Mass)masses.elementAt(massSelected)).selected = true; 
+                }
+            } else if(massMode == FIXED_MASS) {
                 Fmass mass = new Fmass(x,y);
                 masses.add(mass);
             } else {
@@ -364,7 +427,7 @@ public class Canvas extends JComponent implements Runnable{
             massMode = FIXED_MASS;
         }
         if(k == KeyEvent.VK_SPACE) {
-            mode = 1-mode;
+            modetoggle.toggle();
         }
         if(k == KeyEvent.VK_C) {
             masses = new Vector();

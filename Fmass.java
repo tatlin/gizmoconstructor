@@ -1,12 +1,12 @@
 import java.awt.*;
 public class Fmass extends Mass {
     public Fmass(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.x = x-6;
+        this.y = y-6;
     }
     public Fmass(double x, double y, double vX, double vY) {
-        this.x = x;
-        this.y = y;
+        this.x = x-6;
+        this.y = y-6;
     }
     public void move() {}
     public void paintObject(Graphics g) {

@@ -11,14 +11,14 @@ public class Mass extends PhysObject{
     private Vector springforces = new Vector();
     public Mass() {}
     public Mass(double x, double y) {
-        this.x = x;
-        this.y = y;
+        this.x = x-6;
+        this.y = y-6;
         motion = new ForceVector(0,0);
         forces = new ForceVector(0,0);
     }
     public Mass(double x, double y, double vX, double vY) {
-        this.x = x;
-        this.y = y;
+        this.x = x-6;
+        this.y = y-6;
         motion = new ForceVector(vX,vY);
         forces = new ForceVector(0,0);
     }
@@ -86,6 +86,8 @@ public class Mass extends PhysObject{
     public void move() {
         if(selected) {
             motion = new ForceVector(0,0);
+            forces = new ForceVector(0,0);
+            springforces = new Vector();
             return;
         }
         gravity();

@@ -14,7 +14,7 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
      * canvas = drawing surface for everything
      * buff and buffG = buffered graphics variables
      */
-    private double[] env = new double[4];
+    private double[] env = new double[5];
     private Thread simthread, canvasthread;
     private int iters = 0;
     private Canvas canvas;

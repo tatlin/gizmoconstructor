@@ -45,17 +45,18 @@ public class Canvas extends JComponent implements Runnable{
     private int mode = SIMULATE, massMode = FREE_MASS, leftcl = STAT, rightcl = MOVE, shiftl = GRAB, ctrll = DEL, mouseb = -1, mask = -1;
     private int key = 0;
     private int width, height;
-    private double gravity=0.3, friction = 0.0;
-    private MySelector stat = new MySelector(350,469,50,15,0, "stat",0);
-    private MySelector move = new MySelector(350,484,50,15,2, "move",1);
-    private MySelector grab = new MySelector(400,469,50,15,1, "grab",2);
-    private MySelector del  = new MySelector(400,484,50,15,3, "del",3);
-    private MyToggleable modetoggle = new MyToggleable(300, 469, 50, 15, "SIM", "CON");
-    private MyToggleable masstoggle = new MyToggleable(300, 484, 50, 15, "FREE", "FIX");
+    private double gravity=0.3, friction = 0.1, hookes = 0.3;
+    private MySelector stat = new MySelector(465,469,50,15,0, "stat",0);
+    private MySelector move = new MySelector(465,484,50,15,2, "move",1);
+    private MySelector grab = new MySelector(515,469,50,15,1, "grab",2);
+    private MySelector del  = new MySelector(515,484,50,15,3, "del",3);
+    private MyToggleable modetoggle = new MyToggleable(415, 469, 50, 15, "SIM", "CON");
+    private MyToggleable masstoggle = new MyToggleable(415, 484, 50, 15, "FREE", "FIX");
     private MySlider grav = new MySlider(5,474,25,100,30, "G");
-    private MySlider fric = new MySlider(120,474,25,100,0, "F");
-    private MyButton save = new MyButton(240,469,50,15, "SAVE");
-    private MyButton load = new MyButton(240,484,50,15, "LOAD");
+    private MySlider fric = new MySlider(120,474,25,100,10, "F");
+    private MySlider hooke = new MySlider(235,474,25,100,30, "K");
+    private MyButton save = new MyButton(355,469,50,15, "SAVE");
+    private MyButton load = new MyButton(355,484,50,15, "LOAD");
     /**
      * Makes a new Canvas with given height and width
      * 
@@ -69,12 +70,6 @@ public class Canvas extends JComponent implements Runnable{
         setBackground(Color.white);
         masses = new Vector();
         springs = new Vector();
-        Mass m = new Mass(40,40, 10,10);
-        Mass n = new Mass(70,70,15,15);
-        Spring s = new Spring(m,n);
-        springs.add(s);
-        masses.add(m);
-        masses.add(n);
     }
     /**
      * Iterate the physmasses in the masses vector
@@ -83,6 +78,10 @@ public class Canvas extends JComponent implements Runnable{
      */
     public void setEnv(double [] env) {
         this.env = env;
+        env[0] = gravity;
+        env[1] = friction;
+        env[4] = hookes;
+        env[0] = (Math.pow(2,env[0])-1)*4;
         for(Object o: masses) {
             ((Mass)o).setEnv(env);
         }
@@ -106,10 +105,6 @@ public class Canvas extends JComponent implements Runnable{
         } else {
             massMode = FIXED_MASS;
         }
-        if(mode == SIMULATE) {
-            selectedMass = false;
-            ((Mass)masses.elementAt(massSelected)).selected = false;
-        }
         if(!pressed) {
             mouseb = NONE;
             mask = NONE;
@@ -130,14 +125,12 @@ public class Canvas extends JComponent implements Runnable{
             }
         }
         this.env = env;
-        env[0] = gravity;
-        env[1] = friction;
-        env[0] = (Math.pow(2,env[0])-1)*4;
         //env[1] = Math.pow(2,env[1])-1;
         Vector mas = (Vector)masses.clone();
         Vector sps = (Vector)springs.clone();
         gravity = (double)(grav.getValue())/100;
         friction = (double)(fric.getValue())/100;
+        hookes = (double)(hooke.getValue())/100;
         if(startY > height - 30) {
         } else if(mouseb == GRAB && !draggingMass) {
             int i = 0;
@@ -171,6 +164,7 @@ public class Canvas extends JComponent implements Runnable{
                 i++;
             }
             if(closeEnough) {
+                ((Mass)masses.elementAt(min)).exists = false;
                 mas.remove(masses.elementAt(min));
                 deleted = true;
             }
@@ -178,10 +172,22 @@ public class Canvas extends JComponent implements Runnable{
         if(draggingMass) {
             ((Mass)mas.elementAt(massDragged)).x = mouX-3;
             ((Mass)mas.elementAt(massDragged)).y = mouY-3;
+            ((Mass)mas.elementAt(massDragged)).selected = true;
         }    
-        for(Object o:sps) {
-            ((PhysObject)o).move();
-        }
+        try {
+            for(Object o:sps) {
+                try {
+                    ((Spring)o).updateExists();          
+                } catch(Exception e) {}
+                if(!((Spring)o).exists) {
+                    sps.remove(o);
+                } else {
+                    if(mode==SIMULATE) {
+                        ((PhysObject)o).move();
+                    }
+                }
+            }
+        } catch(Exception e) {}
         for(Object o:mas) {
             PhysObject obj = (PhysObject)o;
             obj.setEnv(env);
@@ -196,6 +202,7 @@ public class Canvas extends JComponent implements Runnable{
             } catch (Exception e) {}
         }
         masses = mas;
+        springs = sps;
             
     }
     /**
@@ -232,6 +239,7 @@ public class Canvas extends JComponent implements Runnable{
         del.paintComponent(g);
         grav.paintComponent(g);
         fric.paintComponent(g);
+        hooke.paintComponent(g);
         save.paintComponent(g);
         load.paintComponent(g);
     }
@@ -259,6 +267,7 @@ public class Canvas extends JComponent implements Runnable{
         del.mousePress(x,y);
         grav.mousePress(x,y);
         fric.mousePress(x,y);
+        hooke.mousePress(x,y);
         save.mousePress(x,y);
         load.mousePress(x,y);
         startX = x;
@@ -275,6 +284,7 @@ public class Canvas extends JComponent implements Runnable{
     public void mouseDrag(int x, int y, boolean isR) {
         grav.mouseDrag(x,y);
         fric.mouseDrag(x,y);
+        hooke.mouseDrag(x,y);
         dragging = true;
         mouX = x;
         mouY = y;
@@ -383,7 +393,7 @@ public class Canvas extends JComponent implements Runnable{
             if(mode == CONSTRUCT) {
                 if(selectedMass) {
                     selectedMass = false;
-                    ((Mass)masses.elementAt(massSelected)).selected = true; 
+                    ((Mass)masses.elementAt(massSelected)).selected = false; 
                 }
             } else if(massMode == FIXED_MASS) {
                 Fmass mass = new Fmass(x,y);

@@ -8,7 +8,7 @@ import java.awt.image.*;
  * @version 3.1.4
  */
 public class Simulator extends JPanel implements  Runnable, MouseListener, MouseMotionListener, KeyListener{
-    private double[] env = new double[4];
+    private double[] env = new double[5];
     /**
      * Class fields defined in Simulator:
      * simthread = refresh thread
@@ -21,6 +21,10 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
     private Canvas canvas;
     private Graphics2D buffG;
     private BufferedImage buff;
+    private double lastTime = 0;
+    private int sinceReset = 0;
+    private double fps = 0;
+    private boolean dispFPS = false;
     /**
      * Initialize the applet.
      */
@@ -35,6 +39,7 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
         canvasthread = new Thread(canvas);
         simthread.start();
         this.setBackground(Color.white);
+        lastTime = System.currentTimeMillis();
     }
     /**
      * Start the refresh thread.
@@ -44,14 +49,15 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
      */
     public void run() {
         while(true) {
+            canvas.setEnv(env);
             repaint();
             env[2] = getHeight();
             env[3] = getWidth();
             try {
-                canvas.setEnv(env);
                 simthread.sleep(10);
                 canvasthread.run();
-                canvasthread.join();                
+                canvasthread.join();
+                
                 //this.iters++;
             } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
             //System.out.println(iters + "!!");
@@ -63,6 +69,15 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
      */
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
+        sinceReset++;
+        if(dispFPS) {
+            g.drawString(""+fps,50,50);
+        }
+        if(sinceReset == 50) {
+            fps = ((int)(sinceReset*100000/(System.currentTimeMillis()-lastTime)))/100.0;
+            lastTime = System.currentTimeMillis();
+            sinceReset = 0;
+        }
     }
     /**
      * Update the graphics by just painting

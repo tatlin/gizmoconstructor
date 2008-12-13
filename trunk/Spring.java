@@ -5,7 +5,8 @@ public class Spring extends PhysObject {
     private int bX = 15, bY = 45;
     private double restlength;
     private double k = 1;
-    private double[] env = new double[4];
+    private double[] env;
+    public boolean exists = true;
     public double dist(int mx, int my) {
         try {
             double ya = ma.getY();
@@ -49,14 +50,18 @@ public class Spring extends PhysObject {
     }
     public void move() {
         ForceVector fv = new ForceVector(ma.getX()-mb.getX(), ma.getY()-mb.getY());
-        fv.setM(.5*k*(massdist()-restlength)/stepmult);
+        fv.setM(.5*env[4]*(massdist()-restlength)/stepmult);
         ForceVector fvb = new ForceVector(mb.getX()-ma.getX(), mb.getY()-ma.getY());
-        fvb.setM(.5*k*(massdist()-restlength)/stepmult);
+        fvb.setM(.5*env[4]*(massdist()-restlength)/stepmult);
         ma.addSpring(fvb);
         mb.addSpring(fv);
     }
     public void interact(PhysObject po) {}
     public void paintObject(Graphics g) {
+        if(!ma.exists || !mb.exists) {
+            this.exists = false;
+            return;
+        }
         double drawXa = ma.getX();
         double drawYa = ma.getY();
         if(drawXa > env[3]-bX) {
@@ -84,10 +89,8 @@ public class Spring extends PhysObject {
         g.setColor(Color.black);
         g.drawLine((int)drawXa+3, (int)drawYa+3,(int)drawXb+3,(int)drawYb+3);
     }
-    public void setEnv(double[] e) {
-        for(int i=0;i<e.length;i++) {
-            env[i] = e[i];
-        }
+    public void setEnv(double[] input) {
+        env = input;
     }
     public Spring(int xc, int xd, int yc, int yd) {
         ma = new Mass(xc, yc);
@@ -98,4 +101,13 @@ public class Spring extends PhysObject {
         mb = b;
         restlength = massdist();
     }
+    public void updateExists() {
+        try {
+            if(!ma.exists || !mb.exists) {
+                this.exists = false;
+                return;
+            }
+        } catch (Exception e) {this.exists = false;}
+    }
+        
 }

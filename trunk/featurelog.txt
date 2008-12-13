@@ -12,3 +12,6 @@
 3.1.8	Added SIM/CON toggle button.
 3.1.9	Added buttons to change what each mouse button does - red = left, blue = right, yellow = shift, blue = ctrl
 3.2.0	Added somewhat functional springs. Some bugfixes
+3.2.1	More spring function
+3.2.2	More spring function
+3.2.3	Bugfixes, added K slider.

@@ -4,11 +4,12 @@ import java.util.*;
 public class Mass extends PhysObject{
     public double x = 0, y = 0, oX=0, oY=0;
     private ForceVector forces,  motion;
-    private double[] env = new double[4];
+    private double[] env;
     private boolean mouseOver = false;
     public boolean selected = false;
     private int bX = 15, bY = 45;
     private Vector springforces = new Vector();
+    public boolean exists = true;
     public Mass() {}
     public Mass(double x, double y) {
         this.x = x-6;
@@ -47,9 +48,7 @@ public class Mass extends PhysObject{
         g.fillOval((int)drawX,(int)drawY,6,6);
     }
     public void setEnv(double[] e) {
-        for(int i=0;i<e.length;i++) {
-            env[i] = e[i];
-        }
+        env = e;
     }
     public void gravity() {        
         try {
@@ -85,6 +84,18 @@ public class Mass extends PhysObject{
     }
     public void move() {
         if(selected) {
+            if(y > env[2] - bY) {
+                y = env[2] - bY;
+            }
+            if(y < 0) {
+                y = 0;
+            }
+            if(x > env[3]-bX) {
+                x = env[3]-bX;
+            }
+            if(x < 0) {
+                x = 0;
+            }
             motion = new ForceVector(0,0);
             forces = new ForceVector(0,0);
             springforces = new Vector();

@@ -67,7 +67,7 @@ public class MySelector {
             case 1:  ur = true; break;
             case 2:  bl = true; break;
             case 3:  br = true; break;
-            default: ul = true; break;
+            default: break;
         }
     }
     public int[] getButtons(int[] sofar) {
@@ -75,10 +75,10 @@ public class MySelector {
             sofar[0] = func;
         }
         if(ur) {
-            sofar[1] = func;
+            sofar[2] = func;
         }
         if(bl) {
-            sofar[2] = func;
+            sofar[1] = func;
         }
         if(br) {
             sofar[3] = func;

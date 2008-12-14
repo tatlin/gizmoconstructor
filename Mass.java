@@ -4,12 +4,9 @@ import java.util.*;
 public class Mass extends PhysObject{
     public double x = 0, y = 0, oX=0, oY=0;
     private ForceVector forces,  motion;
-    private double[] env;
-    private boolean mouseOver = false;
-    public boolean selected = false;
-    private int bX = 15, bY = 45;
     private Vector springforces = new Vector();
-    public boolean exists = true;
+    private Vector barsprings = new Vector();
+    public boolean fixed = false;
     public Mass() {}
     public Mass(double x, double y) {
         this.x = x-6;
@@ -24,57 +21,79 @@ public class Mass extends PhysObject{
         forces = new ForceVector(0,0);
     }
     public void interact(PhysObject p) {
-        if(p instanceof Mass) {
-        }
     }
     public void paintObject(Graphics g) {
         g.setColor(Color.black);
         double drawX = x;
         double drawY = y;
-        if(x > env[3]-bX) {
-            drawX = env[3]-bX;
-        } else if (x < 0 ) {
-            drawX = 0;
+        if(drawX > env[1]) {
+            drawX = env[1];
+        } else if (drawX < env[0] ) {
+            drawX = env[0];
         }
-        if(y > env[2]-bY) {
-            drawY = env[2]-bY;
-        } else if(y < 0) {
-            drawY = 0;
+        if(drawY > env[3]) {
+            drawY = env[3];
+        } else if(drawY < env[2]) {
+            drawY = env[2];
         }
         if(selected) {
-            g.setColor(Color.blue);
-            g.drawOval((int)drawX-3, (int)drawY-3, 12, 12);
+            g.setColor(Color.red);
         }
-        g.fillOval((int)drawX,(int)drawY,6,6);
+        if(mouseOver) {
+            g.setColor(Color.blue);
+        }
+        if(fixed) {
+            g.fillRect((int)drawX,(int)drawY,6,6);
+        } else {
+            g.fillOval((int)drawX,(int)drawY,6,6);
+        }
     }
     public void setEnv(double[] e) {
         env = e;
     }
+    public void moveTo(int mx, int my) {
+        x = mx;
+        y = my;
+        if(x > env[1]) {
+            x = env[1];
+        } else if (x < env[0] ) {
+            x = env[0];
+        }
+        if(y > env[3]) {
+            y = env[3];
+        } else if(y < env[2]) {
+            y = env[2];
+        }
+        motion = new ForceVector(0,0);
+    }
+    public void addSpring(ForceVector fv) {
+        springforces.add(fv);
+    }
     public void gravity() {        
         try {
-            forces = forces.add(new ForceVector(0, env[0]/stepmult));
+            forces = forces.add(new ForceVector(0, env[4]/stepmult));
         } catch (Exception e) { System.out.println(e.getMessage());}
     }
     public void bounce() {
-        if(y > env[2] - bY) {
-            y -= 2*(y-env[2] + bY);
+        if(y > env[3]) {
+            y -= 2*(y-env[3]);
             motion.reverseY();
         }
-        if(y < 0) {
-            y = 0;
+        if(y < env[2]) {
+            y -= 2*(y - env[2]);
             motion.reverseY();
         }
-        if(x > env[3]-bX) {
-            x -= 2*(x-env[3]+bX);
+        if(x > env[1]) {
+            x -= 2*(x-env[1]);
             motion.reverseX();
         }
-        if(x < 0) {
-            x = 0;
+        if(x < env[0]) {
+            x -= 2*(x - env[0]);
             motion.reverseX();
         }
     }
     public void friction() {
-        motion.applyFriction(Math.pow(1-env[1],1/stepmult));
+        motion.applyFriction(Math.pow(1-env[5],1/stepmult));
     }
     public void springs() {
         Iterator iter = springforces.iterator();
@@ -82,23 +101,25 @@ public class Mass extends PhysObject{
             forces = forces.add((ForceVector)iter.next());
         }
     }
+    public void barsprings() {}
     public void move() {
-        if(selected) {
-            if(y > env[2] - bY) {
-                y = env[2] - bY;
+        if(selected || fixed) {
+            if(y > env[3]) {
+                y = env[3];
             }
-            if(y < 0) {
-                y = 0;
+            if(y < env[2]) {
+                y = env[2];
             }
-            if(x > env[3]-bX) {
-                x = env[3]-bX;
+            if(x > env[1]) {
+                x = env[1];
             }
-            if(x < 0) {
-                x = 0;
+            if(x < env[0]) {
+                x = env[0];
             }
             motion = new ForceVector(0,0);
             forces = new ForceVector(0,0);
             springforces = new Vector();
+            barsprings = new Vector();
             return;
         }
         gravity();
@@ -108,27 +129,14 @@ public class Mass extends PhysObject{
         x += motion.getX()*motion.getM()/stepmult;
         y += motion.getY()*motion.getM()/stepmult;
         bounce();
+        barsprings();
         forces = new ForceVector(0,0);
         springforces = new Vector();
+        barsprings = new Vector();
     }
     public double dist(int x, int y) {
         double X = this.x+3;
         double Y = this.y+3;
         return Math.pow((((X-x)*(X-x) + (Y-y)*(Y-y))),0.5);
-    }
-    public double getX() {
-        return x;
-    }
-    public double getY() {
-        return y;
-    }
-    public double getVX() {
-        return motion.getX()*motion.getM();
-    }
-    public double getVY() {
-        return motion.getY()*motion.getM();
-    }
-    public void addSpring(ForceVector fv) {
-        springforces.add(fv);
     }
 }

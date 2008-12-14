@@ -23,7 +23,9 @@ public class MySlider {
             value = mx-x;
         }
     }
-    public void mouseDrag(int mx, int my) {
+    public void mouseDrag(int moux, int mouy) {
+        int mx = moux - 5;
+        int my = mouy;
         if(inRect(mx, my)) {
             value = mx-x;
         }

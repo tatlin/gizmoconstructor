@@ -1,18 +1,15 @@
 import java.awt.*;
 import java.math.*;
 public class Spring extends PhysObject {
-    private Mass ma, mb;
-    private int bX = 15, bY = 45;
-    private double restlength;
+    public Mass ma, mb;
+    public double restlength;
     private double k = 1;
-    private double[] env;
-    public boolean exists = true;
     public double dist(int mx, int my) {
         try {
-            double ya = ma.getY();
-            double yb = mb.getY();
-            double xa = ma.getX();
-            double xb = mb.getX();
+            double ya = ma.y;
+            double yb = mb.y;
+            double xa = ma.x;
+            double xb = mb.x;
             double S = (yb-ya)/(xb-xa);
             double ptx = (my-ya+mx/S + S*xa)/(S+1/S);
             double pty = ya + S*(ptx-xa);
@@ -40,53 +37,62 @@ public class Spring extends PhysObject {
             if(pty < miny) {
                 pty = miny;
             }
-            System.out.println(ptx + " " + pty + " ");
             return Math.sqrt((mx-ptx)*(mx-ptx)+(my-pty)*(my-pty));
         } catch(Exception e) {System.out.println(e.getMessage());}
         return 0;
     }
     public double massdist() {
-        return Math.sqrt((ma.getX()-mb.getX())*(ma.getX()-mb.getX()) + (ma.getY()-mb.getY())*(ma.getY()-mb.getY()));
+        return Math.sqrt((ma.x-mb.x)*(ma.x-mb.x) + (ma.y-mb.y)*(ma.y-mb.y));
     }
     public void move() {
-        ForceVector fv = new ForceVector(ma.getX()-mb.getX(), ma.getY()-mb.getY());
-        fv.setM(.5*env[4]*(massdist()-restlength)/stepmult);
-        ForceVector fvb = new ForceVector(mb.getX()-ma.getX(), mb.getY()-ma.getY());
-        fvb.setM(.5*env[4]*(massdist()-restlength)/stepmult);
-        ma.addSpring(fvb);
-        mb.addSpring(fv);
     }
-    public void interact(PhysObject po) {}
+    public void interact(PhysObject po) {
+        if(po instanceof Mass) {
+            if(po == ma) {
+                ForceVector fv = new ForceVector(mb.x-ma.x, mb.y-ma.y);
+                fv.setM(.5*env[6]*(massdist()-restlength)/stepmult);
+                ma.addSpring(fv);
+            }
+            if(po == mb) {
+                ForceVector fv = new ForceVector(ma.x-mb.x, ma.y-mb.y);
+                fv.setM(.5*env[6]*(massdist()-restlength)/stepmult);
+                mb.addSpring(fv);
+            }
+        }
+    }
     public void paintObject(Graphics g) {
         if(!ma.exists || !mb.exists) {
             this.exists = false;
             return;
         }
-        double drawXa = ma.getX();
-        double drawYa = ma.getY();
-        if(drawXa > env[3]-bX) {
-            drawXa = env[3]-bX;
-        } else if (drawXa < 0 ) {
-            drawXa = 0;
+        double drawXa = ma.x;
+        double drawYa = ma.y;
+        if(drawXa > env[1]) {
+            drawXa = env[1];
+        } else if (drawXa < env[0] ) {
+            drawXa = env[0];
         }
-        if(drawYa > env[2]-bY) {
-            drawYa = env[2]-bY;
-        } else if(drawYa < 0) {
-            drawYa = 0;
+        if(drawYa > env[3]) {
+            drawYa = env[3];
+        } else if(drawYa < env[2]) {
+            drawYa = env[2];
         }
-        double drawXb = mb.getX();
-        double drawYb = mb.getY();
-        if(drawXb > env[3]-bX) {
-            drawXb = env[3]-bX;
-        } else if (drawXb < 0 ) {
-            drawXb = 0;
+        double drawXb = mb.x;
+        double drawYb = mb.y;
+        if(drawXb > env[1]) {
+            drawXb = env[1];
+        } else if (drawXb < env[0] ) {
+            drawXb = env[0];
         }
-        if(drawYb > env[2]-bY) {
-            drawYb = env[2]-bY;
-        } else if(drawYa < 0) {
-            drawYb = 0;
+        if(drawYb > env[3]) {
+            drawYb = env[3];
+        } else if(drawYa < env[2]) {
+            drawYb = env[2];
         }
         g.setColor(Color.black);
+        if(selected) {
+            g.setColor(Color.red);
+        }
         g.drawLine((int)drawXa+3, (int)drawYa+3,(int)drawXb+3,(int)drawYb+3);
     }
     public void setEnv(double[] input) {
@@ -101,6 +107,7 @@ public class Spring extends PhysObject {
         mb = b;
         restlength = massdist();
     }
+    public Spring() {}
     public void updateExists() {
         try {
             if(!ma.exists || !mb.exists) {

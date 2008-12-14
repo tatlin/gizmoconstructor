@@ -46,13 +46,12 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
     public void run() {
         while(true) {
             repaint();
-            env[2] = getHeight();
-            env[3] = getWidth();
             try {
-                canvas.setEnv(env);
+                canvas.changeSize(getHeight(), getWidth());
                 simthread.sleep(10);
                 canvasthread.run();
-                canvasthread.join();                
+                canvasthread.join();
+                
                 //this.iters++;
             } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
             //System.out.println(iters + "!!");

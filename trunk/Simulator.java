@@ -42,24 +42,19 @@ public class Simulator extends JPanel implements  Runnable, MouseListener, Mouse
         lastTime = System.currentTimeMillis();
     }
     /**
-     * Start the refresh thread.
-     */
-    /**
      * Iterate the physics, call repaint().
      */
     public void run() {
         while(true) {
-            canvas.setEnv(env);
             repaint();
-            env[2] = getHeight();
-            env[3] = getWidth();
             try {
+                canvas.changeSize(getHeight(), getWidth());
                 simthread.sleep(10);
                 canvasthread.run();
                 canvasthread.join();
                 
                 //this.iters++;
-            } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
+            } catch(Exception ie) {}
             //System.out.println(iters + "!!");
         }
     }

@@ -78,6 +78,9 @@ public class Canvas extends JComponent implements Runnable{
                 mask = CTRLL;
             }
         }
+        if(mode == SIMULATE) {
+        	selectedMass = False;
+        }
         double[] env = new double[7];
         env[0] = LEFT_MARGIN+4;
         env[1] = width - RIGHT_MARGIN-4;
@@ -186,7 +189,9 @@ public class Canvas extends JComponent implements Runnable{
         if(selectedMass) {
             g.setColor(Color.blue);
             Mass m = ((Mass)objects.elementAt(massSelected));
-            g.drawLine((int)m.x+3, (int)m.y+3, mouX-3, mouY-3);
+            if(mouY < height - 30 && startY < height - 30) {
+                g.drawLine((int)m.x+3, (int)m.y+3, mouX-3, mouY-3);            	
+            }
         }
         g.setColor(Color.black);
         g.drawRect(LEFT_MARGIN, TOP_MARGIN, width-RIGHT_MARGIN-LEFT_MARGIN, height-BOTTOM_MARGIN-TOP_MARGIN);

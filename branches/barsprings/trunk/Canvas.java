@@ -155,7 +155,7 @@ public class Canvas extends JComponent implements Runnable{
                     draggingMass = false;
                 }
                 objects.remove((PhysObject)(objects.elementAt(min)));
-                
+                deleted = true;
                 
             }
         }

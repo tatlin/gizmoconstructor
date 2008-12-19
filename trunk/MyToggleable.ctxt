@@ -1,0 +1,14 @@
+#BlueJ class context
+comment0.params=x\ y\ w\ h\ stateA\ stateB
+comment0.target=MyToggleable(int,\ int,\ int,\ int,\ String,\ String)
+comment1.params=g
+comment1.target=void\ paintComponent(Graphics)
+comment2.params=mx\ my
+comment2.target=boolean\ inRect(int,\ int)
+comment3.params=mx\ my
+comment3.target=void\ mousePressed(int,\ int)
+comment4.params=mx\ my
+comment4.target=void\ mouseReleased(int,\ int)
+comment5.target=boolean\ getState()
+comment6.target=void\ toggle()
+numComments=7

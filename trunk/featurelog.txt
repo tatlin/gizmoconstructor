@@ -1,0 +1,17 @@
+3.0.1   Almost no functionality, merely draws a circle.   
+3.0.2   Still almost no functionality, makes a mass that bounces once, then freezes.
+3.0.3   Better, the applet no longer freezes.
+3.1.0   MUCH Better! Applet no longer freezes, runs smoothly. Introduced clicking to add masses, dragging to add them at an initial velocity, Differentiating between right and left clicking.
+3.1.1   Started to work on shift-clicking and dragging to pick up and move things.
+3.1.2   Can shift drag to pick things up. Hold the shift button and left mouse button, and as soon as you're near a mass, you shall pick it up
+3.1.3   Made picking things up less fail, changed the source code slightly so it looks better. 
+3.1.4	Can now delete - hold CTRL and move the mouse near a mass. Toggle simulate/construct with space. Hit d to switch to fixed mass, f for free mass.
+3.1.5   Added G slider
+3.1.6	Changed code to .jar file, added a save file
+3.1.7	Added F slider
+3.1.8	Added SIM/CON toggle button.
+3.1.9	Added buttons to change what each mouse button does - red = left, blue = right, yellow = shift, blue = ctrl
+3.2.0	Added somewhat functional springs. Some bugfixes
+3.2.1	More spring function
+3.2.2	More spring function
+3.2.3	Bugfixes, added K slider.

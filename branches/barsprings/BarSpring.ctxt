@@ -1,0 +1,18 @@
+#BlueJ class context
+comment0.params=mx\ my
+comment0.target=double\ dist(int,\ int)
+comment1.target=double\ massdist()
+comment2.target=void\ move()
+comment3.params=po
+comment3.target=void\ interact(PhysObject)
+comment4.params=g
+comment4.target=void\ paintObject(Graphics)
+comment5.params=input
+comment5.target=void\ setEnv(double[])
+comment6.params=xc\ xd\ yc\ yd
+comment6.target=BarSpring(int,\ int,\ int,\ int)
+comment7.params=a\ b
+comment7.target=BarSpring(Mass,\ Mass)
+comment8.target=BarSpring()
+comment9.target=void\ updateExists()
+numComments=10

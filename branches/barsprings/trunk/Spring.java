@@ -1,9 +1,7 @@
 import java.awt.*;
-import java.math.*;
 public class Spring extends PhysObject {
     public Mass ma, mb;
     public double restlength;
-    private double k = 1;
     public double dist(int mx, int my) {
         try {
             double ya = ma.y;

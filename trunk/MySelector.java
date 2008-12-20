@@ -4,7 +4,7 @@ public class MySelector {
     private boolean ul = false, ur = false, bl = false, br = false;
     private Color lightblue = new Color(153,214,255);
     private final int RIGHTCL = 0, LEFTCL = 1, SHIFTL = 2, CTRLL = 3, STAT = 0, MOVE = 1, GRAB = 2, DEL = 3;
-    private int x,y,h,w, startX, startY, func = STAT;
+    public int x,y,h,w, startX, startY, func = STAT;
     private String label;
     public void paintComponent(Graphics g) {
         g.setColor(Color.black);

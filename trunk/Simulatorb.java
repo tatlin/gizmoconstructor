@@ -14,12 +14,12 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
      * canvas = drawing surface for everything
      * buff and buffG = buffered graphics variables
      */
-    private double[] env = new double[5];
     private Thread simthread, canvasthread;
     private int iters = 0;
     private Canvas canvas;
     private Graphics buffG;
     private Image buff;
+    private static final long serialVersionUID = 0;
     /**
      * Initialize the applet.
      */
@@ -52,7 +52,7 @@ public class Simulatorb extends  JApplet implements  Runnable, MouseListener, Mo
                 canvasthread.run();
                 canvasthread.join();
                 
-                //this.iters++;
+                this.iters++;
             } catch(Exception ie) {System.out.println(ie.getMessage() + "!!!");}
             //System.out.println(iters + "!!");
         }

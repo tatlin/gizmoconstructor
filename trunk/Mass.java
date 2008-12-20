@@ -20,6 +20,13 @@ public class Mass extends PhysObject{
         motion = new ForceVector(vX,vY);
         forces = new ForceVector(0,0);
     }
+    public Mass(double x, double y, boolean isFixed) {
+    	this.x = x-6;
+    	this.y = y-6;
+    	this.fixed = isFixed;
+        motion = new ForceVector(0,0);
+        forces = new ForceVector(0,0);
+    }
     public void interact(PhysObject p) {
     }
     public void paintObject(Graphics g) {

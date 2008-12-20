@@ -4,7 +4,7 @@ public class MySelector {
     private boolean ul = false, ur = false, bl = false, br = false;
     private Color lightblue = new Color(153,214,255);
     private final int RIGHTCL = 0, LEFTCL = 1, SHIFTL = 2, CTRLL = 3, STAT = 0, MOVE = 1, GRAB = 2, DEL = 3;
-    private int x,y,h,w, startX, startY, func = STAT;
+    public int x,y,h,w, startX, startY, func = STAT, state=0;
     private String label;
     public void paintComponent(Graphics g) {
         g.setColor(Color.black);
@@ -47,10 +47,10 @@ public class MySelector {
         }
         if(inRect(mx, my)) {
             switch(mask) {
-                case LEFTCL: ul = true; break;
-                case RIGHTCL: bl = true; break;
-                case SHIFTL: ur = true; break;
-                case CTRLL: br = true; break;
+                case LEFTCL: ul = true; state = 0;break;
+                case RIGHTCL: bl = true; state = 1; break;
+                case SHIFTL: ur = true; state = 2; break;
+                case CTRLL: br = true; state = 3; break;
                 default: break;
             }
         }
@@ -62,6 +62,7 @@ public class MySelector {
         w = nW;
         label = lbl;
         func = fnc;
+        this.state = state;
         switch(state) {
             case 0:  ul = true; break;
             case 1:  ur = true; break;

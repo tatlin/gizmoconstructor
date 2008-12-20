@@ -1,11 +1,11 @@
 import java.awt.*;
 
 public class MyToggleable {
-    private int x, y, h, w, textX, textY, startX, startY;
+    public int x, y, h, w, textX, textY, startX, startY;
     private String stateA, stateB;
     public final boolean STATE_A = false, STATE_B = true;
     private boolean state = STATE_A;
-    public MyToggleable(int x, int y, int w, int h, String stateA, String stateB) {
+    public MyToggleable(int x, int y, int w, int h, String stateA, String stateB, boolean initial) {
         this.x = x;
         this.y = y;
         this.h = h;
@@ -14,6 +14,7 @@ public class MyToggleable {
         this.stateB = stateB;
         textX = (int)((x+w/2)-7*stateA.length()/2);
         textY = (int)((y+h/2)+6);
+        state = initial;
     }
     public void paintComponent(Graphics g) {
         g.setColor(Color.black);

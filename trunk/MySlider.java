@@ -1,7 +1,7 @@
 import java.awt.*;
 
 public class MySlider {
-    private int x, y, h, w, value, startX, startY;
+    public int x, y, h, w, value, startX, startY;
     private String label;
     public void paintComponent(Graphics g) {
         g.setColor(Color.black);

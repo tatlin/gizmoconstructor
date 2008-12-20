@@ -3,7 +3,6 @@ import java.math.*;
 public class BarSpring extends PhysObject {
     public Mass ma, mb;
     public double restlength;
-    private double k = 1;
     public double dist(int mx, int my) {
         try {
             double ya = ma.y;
@@ -83,7 +82,7 @@ public class BarSpring extends PhysObject {
         } else if(drawYa < 0) {
             drawYb = 0;
         }
-        g.setColor(Color.black);
+        g.setColor(Color.blue);
         if(selected) {
             g.setColor(Color.red);
         }

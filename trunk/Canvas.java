@@ -2,8 +2,6 @@ import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
-import java.io.*;
-import java.util.regex.*;
 /**
  * Canvas - a drawing surface for Simulator
  * 
@@ -21,13 +19,13 @@ public class Canvas extends JComponent implements Runnable{
     private final int CONSTRUCT = 0, SIMULATE = 1, FREE_MASS = 0, FIXED_MASS = 1, STAT = 0, MOVE = 1, GRAB = 2, DEL = 3, NONE = -1, RIGHTCL = 0, LEFTCL = 1, SHIFTL = 2, CTRLL = 3;
     private int mode = SIMULATE, massMode = FREE_MASS, leftcl = STAT, rightcl = MOVE, shiftl = GRAB, ctrll = DEL, mouseb = -1, mask = -1, LEFT_MARGIN = 5, RIGHT_MARGIN = 15, TOP_MARGIN = 5, BOTTOM_MARGIN = 55;
     private int key = 0;
-    private int width, height;    
+    private int width, height; 
     private MySelector stat = new MySelector(465,469,50,15,0, "stat",0);
     private MySelector move = new MySelector(465,484,50,15,2, "move",1);
     private MySelector grab = new MySelector(515,469,50,15,1, "grab",2);
     private MySelector del  = new MySelector(515,484,50,15,3, "del",3);
-    private MyToggleable modetoggle = new MyToggleable(415, 469, 50, 15, "SIM", "CON");
-    private MyToggleable masstoggle = new MyToggleable(415, 484, 50, 15, "FREE", "FIX");
+    private MyToggleable modetoggle = new MyToggleable(415, 469, 50, 15, "SIM", "CON", false);
+    private MyToggleable masstoggle = new MyToggleable(415, 484, 50, 15, "FREE", "FIX", false);
     private MySlider grav = new MySlider(5,474,25,100,30, "G");
     private MySlider fric = new MySlider(120,474,25,100,1, "F");
     private MySlider hooke = new MySlider(235,474,25,100,30, "K");
@@ -42,8 +40,19 @@ public class Canvas extends JComponent implements Runnable{
         objects.add(new Mass(10,10,5,5));
     }
     public void changeSize(int height, int width) {
-        this.height = height;
-        this.width = width;
+        this.height = height-10;
+        this.width = width-10;
+        System.out.println(this.height);
+        System.out.println(this.width);
+        stat.y = this.height-31;
+        move.y = this.height-16;
+        grab.y = this.height-31;
+        del.y = this.height-16;
+        modetoggle.y = this.height-31;
+        masstoggle.y = this.height-16;
+        grav.y = this.height-26;
+        fric.y = this.height-26;
+        hooke.y = this.height-26;
     }
     public void run() {
         this.iterate();
@@ -103,7 +112,7 @@ public class Canvas extends JComponent implements Runnable{
             int min = 0;
             boolean closeEnough = false;
             for(Object o: objects) {
-                if(((PhysObject)o).dist(mouX, mouY) < 20) {
+                if(((PhysObject)o).dist(mouX, mouY) < 10) {
                     closeEnough = true;
                     if (((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
                         min = i;
@@ -122,7 +131,7 @@ public class Canvas extends JComponent implements Runnable{
             boolean closeEnough = false;
             for(Object o: objects) {
                 if(o instanceof Mass) {
-                    if(((PhysObject)o).dist(mouX, mouY) < 20) {
+                    if(((PhysObject)o).dist(mouX, mouY) < 10) {
                         closeEnough = true;
                         if (((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
                             min = i;
@@ -142,7 +151,7 @@ public class Canvas extends JComponent implements Runnable{
             int min = 0;
             boolean closeEnough = false;
             for(Object o: objects) {
-                if( ((PhysObject)o).dist(mouX, mouY) < 20) {
+                if( ((PhysObject)o).dist(mouX, mouY) < 10) {
                     closeEnough = true;
                     if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
                         min = i;
@@ -155,7 +164,7 @@ public class Canvas extends JComponent implements Runnable{
                     draggingMass = false;
                 }
                 objects.remove((PhysObject)(objects.elementAt(min)));
-                
+                deleted = true;
                 
             }
         }
@@ -290,7 +299,7 @@ public class Canvas extends JComponent implements Runnable{
                 boolean closeEnough = false;
                 for(Object o: objects) {
                     if(o instanceof Mass) {
-                        if( ((PhysObject)o).dist(mouX, mouY) < 20 ) {
+                        if( ((PhysObject)o).dist(mouX, mouY) < 10 ) {
                             closeEnough = true;
                             if ( ((PhysObject)o).dist(mouX, mouY) < ((PhysObject)objects.elementAt(min)).dist(mouX, mouY)) {
                                 min = i;

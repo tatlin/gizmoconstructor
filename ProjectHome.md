@@ -1,0 +1,2 @@
+See http://sodaplay.com for the original. Inspired by Ed Burton's sodaconstructor.
+Please note that the .jar file is much more stable and faster than the applet - please run the .jar available at http://geekthras.dyndns.org/gizmocons/gizmoconstructor/GizmoConstructor.jar (latest version) or in the Downloads section (milestone versions), but if you can't, feel free to try the applet at http://geekthras.dyndns.org/gizmocons/gizmoconstructor/Simulatorb.html
